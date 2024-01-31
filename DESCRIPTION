@@ -10,7 +10,6 @@ Description: This package implements the MCMC algorithm for covariate-dependent 
     of externel covariates through two types of kernel functions, namely a Gaussian kernel and a periodic kernel.
 License: GPL (>= 2)
 Encoding: UTF-8
-LazyData: true
 RoxygenNote: 7.3.1
 Imports:
     bayNorm,
@@ -19,6 +18,6 @@ Imports:
     SciViews,
     Matrix,
     Rtsne,
-    irlba,
     sets,
     truncnorm
+

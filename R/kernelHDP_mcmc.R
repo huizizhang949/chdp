@@ -1,4 +1,41 @@
-
+#' Perform MCMC for covariate-dependent hierarchical Dirichlet process on single-cell data
+#'
+#' @import stats
+#' @importFrom utils setTxtProgressBar txtProgressBar
+#' @importFrom SciViews ln
+#' @param Y a
+#' @param t a
+#' @param niter a
+#' @param J a
+#' @param burn_in a
+#' @param thinning a
+#' @param empirical a
+#' @param empirical_z a
+#' @param Z_fix a
+#' @param b_initial a
+#' @param alpha_initial a
+#' @param alpha_0_initial a
+#' @param quadratic a
+#' @param MH.variance a
+#' @param mu_r a
+#' @param sigma_r a
+#' @param eta_1 a
+#' @param eta_2 a
+#' @param mu_h a
+#' @param sigma_h a
+#' @param kappa_1 a
+#' @param kappa_2 a
+#' @param beta.mean a
+#' @param alpha_mu_2 a
+#' @param partial.save.name a
+#' @param save_frequency a
+#' @param auto.save a
+#' @param partial_pca a
+#' @param save_ind a
+#'
+#' @return MCMC output for all parameters
+#' @export
+#'
 kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
                            empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
                            b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
@@ -185,11 +222,11 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
           i_all_complement <- lapply(ind, function(c) {
             temp <- -2*sigma_star_2_J_D[j,d]*(ln(-ln(U_C_J_D[[d]][c,j]))-ln(Xi_C_D[[d]][c])-ln(Q_J_D[j,d]))
 
-            i_complement <- interval(t[[d]][c]-sqrt(temp),t[[d]][c]+sqrt(temp),'[]')
+            i_complement <- sets::interval(t[[d]][c]-sqrt(temp),t[[d]][c]+sqrt(temp),'[]')
             return(i_complement)
           })
 
-          i_all <- interval_complement(interval_union(i_all_complement))
+          i_all <- sets::interval_complement(sets::interval_union(i_all_complement))
         }
 
         # Parameters in posterior distribution (Normal)
@@ -227,7 +264,7 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
           # Select one truncated region (one interval)
           ind2 <- sample(1:N_interval, size = 1, prob = exp(log_p+log_K)) #breakpoint
           i_chosen <- i_all[[ind2]]
-          t_star[j,d] <- rtruncnorm(1,a=as.numeric(unlist(i_chosen)[1]),
+          t_star[j,d] <- truncnorm::rtruncnorm(1,a=as.numeric(unlist(i_chosen)[1]),
                                     b=as.numeric(unlist(i_chosen)[2]),
                                     mean = r_j_hat, sd = sqrt(s_2_hat))
         }
@@ -433,7 +470,7 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
 
     rate <- eta_2+sum(temp^2)/2
 
-    s_2 <- rinvgamma(1,alpha = shape,beta = rate)
+    s_2 <- extraDistr::rinvgamma(1,alpha = shape,beta = rate)
 
     return(s_2)
   }
@@ -465,7 +502,7 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
 
     rate <- kappa_2+sum(temp^2)/2
 
-    m_2 <- rinvgamma(1,alpha = shape,beta = rate)
+    m_2 <- extraDistr::rinvgamma(1,alpha = shape,beta = rate)
 
     return(m_2)
   }
@@ -712,16 +749,16 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
 
 
     # Setting parameters
-    V_tilde_b <- solve(parameter0)
+    V_tilde_b <- Matrix::solve(parameter0)
     m_tilde_b <- V_tilde_b%*%parameter1
     v_tilde_1 <- v_1 + J*G/2
     v_tilde_2 <- v_2 + 1/2*(parameter2-t(m_tilde_b)%*%parameter0%*%(m_tilde_b) + sum(m_b^2))
 
     # Simulate alpha_phi_2
-    alpha_phi_2 <- rinvgamma(n = 1, alpha = v_tilde_1, beta = v_tilde_2) # rinvgamma comes from the extraDistr package
+    alpha_phi_2 <- extraDistr::rinvgamma(n = 1, alpha = v_tilde_1, beta = v_tilde_2)
 
     # Simulate b
-    b <- rmvnorm(n=1, mean = m_tilde_b, sigma = alpha_phi_2*(V_tilde_b))
+    b <- mvtnorm::rmvnorm(n=1, mean = m_tilde_b, sigma = alpha_phi_2*(V_tilde_b))
 
     # Return alpha_phi_2 and b
     return(list(alpha_phi_2=alpha_phi_2,b=b))
@@ -806,9 +843,9 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
           # Adaptive MH
           # Simulate new value of X, based on the previous value and covariance structure
           if(n <= 100){
-            X_mu_phi_star_new <- rmvnorm(n = 1, mean = X_mu_phi_star_old, sigma = 0.01*diag(1,nrow = 2, ncol = 2))
+            X_mu_phi_star_new <- mvtnorm::rmvnorm(n = 1, mean = X_mu_phi_star_old, sigma = 0.01*diag(1,nrow = 2, ncol = 2))
           }else{
-            X_mu_phi_star_new <- rmvnorm(n = 1, mean = X_mu_phi_star_old,
+            X_mu_phi_star_new <- mvtnorm::rmvnorm(n = 1, mean = X_mu_phi_star_old,
                                          sigma = 1*(covariance_old[[j]][[g]] + MH.variance*diag(1,nrow = 2, ncol = 2)))
           }
 
@@ -1005,7 +1042,7 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
   if(is.null(Z_fix)){
     if(empirical_z==TRUE){
       Y_all <- t(cbind(Y[[1]],Y[[2]]))
-      tsne_results <- Rtsne(Y_all, perplexity=30, check_duplicates = FALSE, partial_pca = partial_pca)
+      tsne_results <- Rtsne::Rtsne(Y_all, perplexity=30, check_duplicates = FALSE, partial_pca = partial_pca)
       km_cluster <- kmeans(tsne_results$Y,centers=J)$cluster
 
       # Allocation variables Z
@@ -1097,11 +1134,11 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
   # This is to ensure the initial mu, phi have some differences and also similarities across clusters
 
   # bayNorm without Z
-  baynorm_HET <- bayNorm(Data = Y[[1]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
+  baynorm_HET <- bayNorm::bayNorm(Data = Y[[1]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
                          BB_SIZE = FALSE, verbose = FALSE)
-  baynorm_HOM <- bayNorm(Data = Y[[2]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
+  baynorm_HOM <- bayNorm::bayNorm(Data = Y[[2]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
                          BB_SIZE = FALSE, verbose = FALSE)
-  baynorm_tot <- bayNorm(Data = cbind(Y[[1]], Y[[2]]), BETA_vec = NULL, mode_version = TRUE,
+  baynorm_tot <- bayNorm::bayNorm(Data = cbind(Y[[1]], Y[[2]]), BETA_vec = NULL, mode_version = TRUE,
                          mean_version = FALSE, BB_SIZE = FALSE, verbose = FALSE)
 
   mu.estimate <- baynorm_tot$PRIORS$MME_prior$MME_MU
@@ -1118,12 +1155,12 @@ kernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
                          phi.estimate)
 
   # bayNorm with Z
-  baynorm_HET_by_z <- bayNorm(Data = Y[[1]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
+  baynorm_HET_by_z <- bayNorm::bayNorm(Data = Y[[1]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
                               BB_SIZE = FALSE, verbose = FALSE, Conditions = Z_initial[[1]], Prior_type = 'LL')
-  baynorm_HOM_by_z <- bayNorm(Data = Y[[2]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
+  baynorm_HOM_by_z <- bayNorm::bayNorm(Data = Y[[2]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
                               BB_SIZE = FALSE, verbose = FALSE, Conditions = Z_initial[[2]], Prior_type = 'LL')
 
-  baynorm_tot_by_z <- bayNorm(Data = cbind(Y[[1]], Y[[2]]), BETA_vec = NULL, mode_version = TRUE,
+  baynorm_tot_by_z <- bayNorm::bayNorm(Data = cbind(Y[[1]], Y[[2]]), BETA_vec = NULL, mode_version = TRUE,
                               mean_version = FALSE, BB_SIZE = FALSE, verbose = FALSE, Conditions = c(Z_initial[[1]],
                                                                                                      Z_initial[[2]]),
                               Prior_type = 'LL')
