@@ -35,7 +35,7 @@
 #' @param save_frequency if \code{auto.save=TRUE}, save the intermediate results every \code{save_frequency} iterations.
 #' @param save_ind optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.
 #'
-#' @usage pkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 1,
+#' @usage pkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
 #'     empirical_z = NULL, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
 #'     MH.variance = 0.01, target_accept = 0.234,
 #'     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
@@ -70,7 +70,7 @@
 #'
 #' @export
 #'
-pkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 1,
+pkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
                             empirical_z = NULL, Z_fix = NULL,
                             alpha_initial = 1, alpha_0_initial = 1,
                             MH.variance = 0.01, target_accept = 0.234,
@@ -171,6 +171,9 @@ pkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 1,
     }
   }else{
     Z_initial <- Z_fix
+    if(J!=length(unique(unlist(Z_fix)))) {
+      stop('J is not equal to the number of clusters in the supplied allocations')
+    }
   }
 
   # Assume a common lambda within each dataset; period T=pi*lambda; t \in (0,1)

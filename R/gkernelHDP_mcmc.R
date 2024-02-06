@@ -42,7 +42,7 @@
 #' See \code{Rtsne}.
 #' @param save_ind optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.
 #'
-#' @usage gkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 5,
+#' @usage gkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
 #'     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
 #'     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
 #'     quadratic = FALSE, MH.variance = 0.01,
@@ -83,7 +83,7 @@
 #'
 #' @export
 #'
-gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
+gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
                             empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
                             b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
                             quadratic=FALSE, MH.variance = 0.01,
@@ -311,7 +311,7 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
       phi_star_1_J_initial[j,] <- phi.estimate
     }
   }
-  print(paste(k,'clusters have global mu/phi initialization'))
+  # print(paste(k,'clusters have global mu/phi initialization'))
 
   # Cell-specific capture efficiency beta_c_d from bayNorm estimates
   Beta_initial <- NULL
@@ -343,13 +343,13 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
 
   # Estimated sigma^2 (of the linear model): variance of log-phi, used as the initial value of alpha_phi^2
   alpha_phi_2_initial <- deviance(lm.1)/df.residual(lm.1)
-  print(paste("alpha_phi_2_initial:",alpha_phi_2_initial))
+  # print(paste("alpha_phi_2_initial:",alpha_phi_2_initial))
 
   # Initialize b
   if(is.null(b_initial)) {
     b_initial <- as.numeric(coef(lm.1))
   }
-  print(paste("b_initial:",b_initial))
+  # print(paste("b_initial:",b_initial))
 
   # ---------Prior settings-------------
   # Only rely on mu, phi and beta from bayNorm without Z, so the priors for different runs are the same as long as the dataset is fixed
@@ -360,7 +360,7 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
     # prior log(mu) ~ N(0, alpha_mu^2), so alpha_mu^2 = mean(log(mu)^2)
     alpha_mu_2 <- mean(c(log(mu.estimate)^2))
   }
-  print(paste("alpha_mu_2:",alpha_mu_2))
+  # print(paste("alpha_mu_2:",alpha_mu_2))
 
   # m_b, v1 and v2
   x.2 <- log(mu.estimate)
@@ -384,7 +384,7 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
   }else{
     v_1 <- 2; v_2 <- 1
   }
-  print(paste("v1,v2:",v_1,v_2))
+  # print(paste("v1,v2:",v_1,v_2))
 
   if(empirical == TRUE){
     m_b <- as.numeric(coef(lm.2))
@@ -395,7 +395,7 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
       m_b <- c(-1,2)
     }
   }
-  print(paste("m_b:",m_b))
+  # print(paste("m_b:",m_b))
 
   # Function to set empirical values for hyper parameters in prior of beta ~ Beta(a_d,b_d)
   baynorm_estimate_beta_param <- function(baynorm_output, additional_variance, beta.mean){
@@ -433,7 +433,7 @@ gkernelHDP_mcmc <- function(Y, t, niter, J, burn_in = 1000, thinning = 5,
   if(any(c(a_d_beta,b_d_beta)<0)) {
     stop('Prior setting for beta inappropriate!!')
   }
-  print(paste('betas:',a_d_beta,b_d_beta))
+  # print(paste('betas:',a_d_beta,b_d_beta))
 
 
   #--------------------------------------------------------------------------------

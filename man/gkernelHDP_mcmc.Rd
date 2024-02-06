@@ -4,7 +4,7 @@
 \alias{gkernelHDP_mcmc}
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
-gkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 5,
+gkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 1,
     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
     quadratic = FALSE, MH.variance = 0.01,
