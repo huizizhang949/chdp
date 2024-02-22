@@ -16,7 +16,8 @@
 #' diagonal blocks correspond to within-dataset posterior similarity matrix.
 #' @export
 #'
-plotpsm <- function(psm.tot,size){
+#' @examples plot_psm(psm.tot = psm, size = c(120, 120))
+plot_psm <- function(psm.tot,size){
   # size: the size of each dataset
   if(any(psm.tot !=t(psm.tot)) | any(psm.tot >1) | any(psm.tot < 0) | sum(diag(psm.tot)) != nrow(psm.tot) ){
     stop("psm.tot must be a symmetric matrix with entries between 0 and 1 and 1's on the diagonals")}

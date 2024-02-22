@@ -35,12 +35,8 @@
 #' @param kappa_1,kappa_2 shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.
 #' @param beta.mean an estimate of global mean capture efficiency across cells, default to 0.06.
 #' @param alpha_mu_2 optional. Prior variance for \eqn{\mu^*_{j,g}}. If not provided, empirical values will be used.
-#' @param auto.save logical. Whether intermediate results should be saved during MCMC sampling.
-#' @param partial.save.name if \code{auto.save=TRUE}, the path and name to save the intermediate results.
-#' @param save_frequency if \code{auto.save=TRUE}, save the intermediate results every \code{save_frequency} iterations.
 #' @param partial_pca if \code{empirical_z=TRUE}, whether truncated PCA should be used to calculate principal components (requires the irlba package).
 #' See \code{Rtsne}.
-#' @param save_ind optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.
 #'
 #' @usage gkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
 #'     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
@@ -49,8 +45,7 @@
 #'     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
 #'     sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
 #'     beta.mean = 0.06, alpha_mu_2 = NULL,
-#'     auto.save = FALSE, partial.save.name = NULL, save_frequency = 100,
-#'     partial_pca = FALSE, save_ind = NULL)
+#'     partial_pca = FALSE)
 #'
 #' @return \code{gkernelHDP_mcmc} returns a list containing the following components:
 #' \item{output_index}{total number of saved MCMC samples, taking into account of burn-in and thinning.}
@@ -83,6 +78,9 @@
 #'
 #' @export
 #'
+#' @examples
+#' gkernelHDP_mcmc(Y = list(t(y1), t(y2)), t = list(t1, t2), J = 4, niter = 1000,
+#'                 burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
 gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
                             empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
                             b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
@@ -90,8 +88,7 @@ gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
                             mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
                             sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
                             beta.mean = 0.06, alpha_mu_2 = NULL,
-                            auto.save = FALSE, partial.save.name = NULL, save_frequency = 100,
-                            partial_pca = FALSE, save_ind = NULL){
+                            partial_pca = FALSE){
 
   # Show time
   start_time <- Sys.time()
@@ -551,16 +548,9 @@ gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
     setTxtProgressBar(pb, iter)
     # Starting value of the output index = 1
     # If the current iteration is greater than the burn in and divisible by the thinning index
-    # In the case of thinning, if we require to save some samples that are not divisible by thinning (for consensus clustering) or before burn-in
-    if(is.null(save_ind)) {
-      criterion1 <- FALSE
-    }else{
-      criterion1 <- any((iter-1)==save_ind)
-    }
+    criterion <- (iter-1 > burn_in & (iter-1-burn_in)%%thinning == 0)
 
-    criterion2 <- (iter-1 > burn_in & (iter-1-burn_in)%%thinning == 0)
-
-    if(criterion1 | criterion2){
+    if(criterion){
       output_index <- output_index + 1
       update <- TRUE
     }else{
@@ -772,21 +762,6 @@ gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
       h_J_output[[output_index]] <- as.vector(unname(h_J_new))
       m_2_output[output_index] <- m_2_new
 
-    }
-
-    if((iter-1) %% save_frequency == 0 && auto.save == TRUE){
-      my_list <- list('b_output' = b_output, 'alpha_phi2_output' = alpha_phi_2_output, 'Z_output' = Z_output,
-                      'P_C_J_D_output' = P_C_J_D_output,  'P_output' = P_output, 'alpha_output' = alpha_output,
-                      'alpha_0_output' = alpha_0_output, 'mu_star_1_J_output' = mu_star_1_J_output,
-                      'phi_star_1_J_output' = phi_star_1_J_output, 'Beta_output' = Beta_output,
-                      'Q_J_D_output' = Q_J_D_output, 'Xi_C_D_output' = Xi_C_D_output, 't_star_J_D_output' = t_star_J_D_output,
-                      'sigma_star_2_J_D_output' = sigma_star_2_J_D_output, 'U_C_J_D_output' = U_C_J_D_output,
-                      'r_J_output' = r_J_output, 's_2_output' = s_2_output, 'h_J_output' = h_J_output, 'm_2_output' = m_2_output,
-                      'acceptance_count_avg' = acceptance_count_avg,
-                      'output_index' = output_index,
-                      'alpha_mu_2' = alpha_mu_2, 'v_1' = v_1, 'v_2' = v_2, 'm_b' = m_b,
-                      'a_d_beta' = a_d_beta, 'b_d_beta' = b_d_beta)
-      save(my_list, file=partial.save.name)
     }
 
   }

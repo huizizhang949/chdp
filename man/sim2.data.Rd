@@ -3,7 +3,7 @@
 \docType{data}
 \name{sim2.data}
 \alias{sim2.data}
-\title{Simulated data from normal likelihood (vector autoregression) with a periodic kernel}
+\title{Simulated data from VAR likelihood with a periodic kernel}
 \format{
 A matrix with 300 rows and 6 columns, with rows for observations:
 \describe{
@@ -19,8 +19,8 @@ of belonging to two clusters.
 sim2.data
 }
 \description{
-Two simulated datasets from a mixture of two normal distributions, for \eqn{G=2} features.
-Both clusters are shared across two datasets. The periodic kernel is applied to introduce
-dependence on the external covariate (time).
+Two simulated datasets from a mixture of two normal distributions with vector autoregression,
+for \eqn{G=2} features. Both clusters are shared across two datasets.
+The periodic kernel is applied to introduce dependence on the external covariate (time).
 }
 \keyword{datasets}

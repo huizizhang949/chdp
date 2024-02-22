@@ -32,5 +32,11 @@ Imports:
     MCMCpack,
     mvnfast,
     mclust,
-    pheatmap
+    pheatmap,
+    data.table,
+    mcclust.ext,
+    mcclust,
+    tidyr,
+    ggplot2,
+    gridExtra
 

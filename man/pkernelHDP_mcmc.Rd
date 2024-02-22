@@ -2,9 +2,9 @@
 % Please edit documentation in R/pkernelHDP_mcmc.R
 \name{pkernelHDP_mcmc}
 \alias{pkernelHDP_mcmc}
-\title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two calcium imaging datasets}
+\title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across time-series data}
 \usage{
-pkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 1,
+pkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
     empirical_z = NULL, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
     MH.variance = 0.01, target_accept = 0.234,
     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
@@ -18,9 +18,9 @@ Both datasets should share the same set of features.}
 
 \item{t}{a list of two vectors. Each vector is the external covariate (time) for individual dataset.}
 
-\item{niter}{integer. Total number of MCMC iterations.}
-
 \item{J}{integer. Truncation level, i.e., the number of clusters to be found.}
+
+\item{niter}{integer. Total number of MCMC iterations.}
 
 \item{burn_in}{the length of burn-in period during MCMC.}
 

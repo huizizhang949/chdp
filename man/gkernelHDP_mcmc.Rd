@@ -4,15 +4,14 @@
 \alias{gkernelHDP_mcmc}
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
-gkernelHDP_mcmc(Y, t, niter, J, burn_in = 1000, thinning = 1,
+gkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
     quadratic = FALSE, MH.variance = 0.01,
     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
     sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
     beta.mean = 0.06, alpha_mu_2 = NULL,
-    auto.save = FALSE, partial.save.name = NULL, save_frequency = 100,
-    partial_pca = FALSE, save_ind = NULL)
+    partial_pca = FALSE)
 }
 \arguments{
 \item{Y}{a list of two matrices. Each is a gene-by-cell \eqn{(G \times C_d)} matrix of mRNA counts for individual dataset \eqn{d}.
@@ -20,9 +19,9 @@ Both datasets should share the same set of genes.}
 
 \item{t}{a list of two vectors. Each vector is the external covariate (latent time) for individual dataset.}
 
-\item{niter}{integer. Total number of MCMC iterations.}
-
 \item{J}{integer. Truncation level, i.e., the number of clusters to be found.}
+
+\item{niter}{integer. Total number of MCMC iterations.}
 
 \item{burn_in}{the length of burn-in period during MCMC.}
 
@@ -58,16 +57,8 @@ post-processing step where allocations are fixed to the optimal clustering to in
 
 \item{alpha_mu_2}{optional. Prior variance for \eqn{\mu^*_{j,g}}. If not provided, empirical values will be used.}
 
-\item{auto.save}{logical. Whether intermediate results should be saved during MCMC sampling.}
-
-\item{partial.save.name}{if \code{auto.save=TRUE}, the path and name to save the intermediate results.}
-
-\item{save_frequency}{if \code{auto.save=TRUE}, save the intermediate results every \code{save_frequency} iterations.}
-
 \item{partial_pca}{if \code{empirical_z=TRUE}, whether truncated PCA should be used to calculate principal components (requires the irlba package).
 See \code{Rtsne}.}
-
-\item{save_ind}{optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.}
 }
 \value{
 \code{gkernelHDP_mcmc} returns a list containing the following components:
@@ -104,4 +95,8 @@ Implement Gibbs sampling and adaptive Metropolis-Hastings algorithm to draw each
 A Gaussian kernel is applied to introduce dependence on the external covariate, i.e., latent time, and the
 algorithm provides posterior samples for all parameters including cluster allocations. The function is also
 used in the post-processing step to fix allocations to the optimal clustering, in order to infer cluster-specific parameters.
+}
+\examples{
+gkernelHDP_mcmc(Y = list(t(y1), t(y2)), t = list(t1, t2), J = 4,
+                niter = Depth, burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
 }

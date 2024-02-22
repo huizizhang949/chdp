@@ -19,8 +19,8 @@ of belonging to two clusters.
 sim1.data
 }
 \description{
-Two simulated datasets from a mixture of two binomial distributions, for \eqn{G=10} genes.
-Both clusters are shared across two datasets. The Gaussian kernel is applied to introduce
+Two simulated datasets generated from a mixture of two binomial distributions with an overall mean of 0.6
+for capture efficiency. Both clusters are shared across two datasets. The Gaussian kernel is applied to introduce
 dependence on the external covariate (latent time).
 }
 \keyword{datasets}

@@ -1,8 +1,8 @@
 #' Simulated data from negative binomial likelihood with a Gaussian kernel
 #'
 #' @description
-#' Two simulated datasets from a mixture of two binomial distributions, for \eqn{G=10} genes.
-#' Both clusters are shared across two datasets. The Gaussian kernel is applied to introduce
+#' Two simulated datasets generated from a mixture of two binomial distributions with an overall mean of 0.6
+#' for capture efficiency. Both clusters are shared across two datasets. The Gaussian kernel is applied to introduce
 #' dependence on the external covariate (latent time).
 #'
 #' @format A matrix with 240 rows and 14 columns, with rows for observations (cells):
@@ -18,12 +18,12 @@
 
 
 
-#' Simulated data from normal likelihood (vector autoregression) with a periodic kernel
+#' Simulated data from VAR likelihood with a periodic kernel
 #'
 #' @description
-#' Two simulated datasets from a mixture of two normal distributions, for \eqn{G=2} features.
-#' Both clusters are shared across two datasets. The periodic kernel is applied to introduce
-#' dependence on the external covariate (time).
+#' Two simulated datasets from a mixture of two normal distributions with vector autoregression,
+#' for \eqn{G=2} features. Both clusters are shared across two datasets.
+#' The periodic kernel is applied to introduce dependence on the external covariate (time).
 #'
 #' @format A matrix with 300 rows and 6 columns, with rows for observations:
 #' \describe{

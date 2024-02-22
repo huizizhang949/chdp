@@ -1,4 +1,4 @@
-#' Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two calcium imaging datasets
+#' Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across time-series data
 #'
 #' @description
 #' Implement Gibbs sampling and adaptive Metropolis-Hastings algorithm to draw each parameter sequentially.
@@ -69,7 +69,6 @@
 #' \item{Phi0, omega0}{prior parameters for \eqn{\Sigma_j^*}.}
 #'
 #' @export
-#'
 pkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
                             empirical_z = NULL, Z_fix = NULL,
                             alpha_initial = 1, alpha_0_initial = 1,
