@@ -35,3 +35,8 @@
 #' }
 #' }
 "sim2.data"
+
+#' a vector of names for 16 distinguished colors
+"c16"
+
+

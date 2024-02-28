@@ -15,13 +15,14 @@
 #' Both datasets should share the same set of features.
 #' @param t a list of two vectors. Each vector is the external covariate (time) for individual dataset.
 #' @param niter integer. Total number of MCMC iterations.
-#' @param J integer. Truncation level, i.e., the number of clusters to be found.
+#' @param J integer. Truncation level, i.e., the number of clusters to be found. Only required when estimating \code{Z}.
 #' @param burn_in the length of burn-in period during MCMC.
 #' @param thinning the thinning applied after burn-in period.
 #' @param empirical_z optional. Should be provided when \code{Z_fix} is not.
 #' If \code{Z_fix} is not provided and \code{empirical_z=TRUE}, a simple Gaussian mixture model
 #' is fitted using package \code{mclust}. If \code{empirical_z=FALSE}, clusters are randomly initialized.
-#' @param Z_fix optional. Should be provided when \code{empirical_z} is not. Typically used in the
+#' @param Z_fix optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
+#' where each vector stores the allocations in one dataset. Typically used in the
 #' post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.
 #' @param alpha_initial,alpha_0_initial initial values for concentration parameters \eqn{\alpha,\alpha_0}.
 #' @param MH.variance additional variance added to the empirical covariance (variance) in adaptive Metropolis-Hastings.
@@ -35,7 +36,7 @@
 #' @param save_frequency if \code{auto.save=TRUE}, save the intermediate results every \code{save_frequency} iterations.
 #' @param save_ind optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.
 #'
-#' @usage pkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
+#' @usage pkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
 #'     empirical_z = NULL, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
 #'     MH.variance = 0.01, target_accept = 0.234,
 #'     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
@@ -69,7 +70,7 @@
 #' \item{Phi0, omega0}{prior parameters for \eqn{\Sigma_j^*}.}
 #'
 #' @export
-pkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
+pkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
                             empirical_z = NULL, Z_fix = NULL,
                             alpha_initial = 1, alpha_0_initial = 1,
                             MH.variance = 0.01, target_accept = 0.234,
@@ -118,6 +119,14 @@ pkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
   # Remove first observation from Y and t
   Y[[1]] <- Y[[1]][-1,]; Y[[2]] <- Y[[2]][-1,]
   t[[1]] <- t[[1]][-1]; t[[2]] <- t[[2]][-1]
+
+  if(is.null(J) & is.null(Z_fix)){
+    stop('At least one of J or Z_fix should be provided!')
+  }
+
+  if(is.null(J)){
+    J <- length(unique(unlist(Z_fix)))
+  }
 
   #------------------------ Step 1: Prepare for outputs -----------------
   Z_output <- NULL
@@ -170,9 +179,6 @@ pkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
     }
   }else{
     Z_initial <- Z_fix
-    if(J!=length(unique(unlist(Z_fix)))) {
-      stop('J is not equal to the number of clusters in the supplied allocations')
-    }
   }
 
   # Assume a common lambda within each dataset; period T=pi*lambda; t \in (0,1)

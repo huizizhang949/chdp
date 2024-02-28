@@ -4,7 +4,7 @@
 \alias{cluster_size}
 \title{Produce a summary of cluster size}
 \usage{
-cluster_size(opt_cl, data_names)
+cluster_size(opt_cl, data_names = NULL)
 }
 \arguments{
 \item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}

@@ -33,10 +33,11 @@ Imports:
     mvnfast,
     mclust,
     pheatmap,
-    data.table,
     mcclust.ext,
     mcclust,
     tidyr,
     ggplot2,
-    gridExtra
+    gridExtra,
+    coda,
+    pbmcapply
 

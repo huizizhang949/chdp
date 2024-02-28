@@ -9,7 +9,7 @@ opt_cl_consensus(Width, Depth, consensus_result)
 \arguments{
 \item{Width}{a suitable value for width.}
 
-\item{Depth}{a suitable value for depth}
+\item{Depth}{a suitable value for depth.}
 
 \item{consensus_result}{a list of outputs from \code{gkernelHDP_mcmc}.}
 }
@@ -19,7 +19,7 @@ a list containing the following:
 \item{psm}{posterior similarity matrix based on the provided width and depth.}
 }
 \description{
-Provide the optimal clustering and posterior similarity matrix
+Provide the optimal clustering and posterior similarity matrix.
 }
 \examples{
 opt_cl_consensus(W = 100, D = 1000, consensus_result = consensus_result)

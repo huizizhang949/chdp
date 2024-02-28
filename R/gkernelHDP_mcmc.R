@@ -15,7 +15,7 @@
 #' Both datasets should share the same set of genes.
 #' @param t a list of two vectors. Each vector is the external covariate (latent time) for individual dataset.
 #' @param niter integer. Total number of MCMC iterations.
-#' @param J integer. Truncation level, i.e., the number of clusters to be found.
+#' @param J integer. Truncation level, i.e., the number of clusters to be found. Only required when estimating \code{Z}.
 #' @param burn_in the length of burn-in period during MCMC.
 #' @param thinning the thinning applied after burn-in period.
 #' @param empirical logical. If TRUE, empirical values are used to set up the prior for \eqn{\alpha_{\phi}^2} and \eqn{\mathbf{b}}.
@@ -23,7 +23,8 @@
 #' If \code{Z_fix} is not provided and \code{empirical_z=TRUE}, t-sne is first performed to reduce
 #' the combined datasets into two dimensions, and k-means is applied to find \eqn{J} clusters on
 #' the lower-dimensional embeddings. If \code{empirical_z=FALSE}, clusters are randomly initialized.
-#' @param Z_fix optional. Should be provided when \code{empirical_z} is not. Typically used in the
+#' @param Z_fix optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
+#' where each vector stores the allocations in one dataset. Typically used in the
 #' post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.
 #' @param b_initial optional. Initial values for \eqn{\mathbf{b}}. If not provided, empirical values will be used.
 #' @param alpha_initial,alpha_0_initial initial values for concentration parameters \eqn{\alpha,\alpha_0}.
@@ -38,7 +39,7 @@
 #' @param partial_pca if \code{empirical_z=TRUE}, whether truncated PCA should be used to calculate principal components (requires the irlba package).
 #' See \code{Rtsne}.
 #'
-#' @usage gkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
+#' @usage gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
 #'     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
 #'     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
 #'     quadratic = FALSE, MH.variance = 0.01,
@@ -81,7 +82,7 @@
 #' @examples
 #' gkernelHDP_mcmc(Y = list(t(y1), t(y2)), t = list(t1, t2), J = 4, niter = 1000,
 #'                 burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
-gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
+gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
                             empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
                             b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
                             quadratic=FALSE, MH.variance = 0.01,
@@ -112,7 +113,13 @@ gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
   # Data size
   C_d <- rep(0,2); C_d[1] <- ncol(Y[[1]]); C_d[2] <- ncol(Y[[2]])
 
+  if(is.null(J) & is.null(Z_fix)){
+    stop('At least one of J or Z_fix should be provided!')
+  }
 
+  if(is.null(J)){
+    J <- length(unique(unlist(Z_fix)))
+  }
   #------------------------ Step 1: Prepare for outputs -----------------
   b_output <- NULL
   alpha_phi_2_output <- c()
@@ -164,9 +171,6 @@ gkernelHDP_mcmc <- function(Y, t, J, niter, burn_in = 1000, thinning = 1,
 
   }else{
     Z_initial <- Z_fix
-    if(J!=length(unique(unlist(Z_fix)))) {
-      stop('J is not equal to the number of clusters in the supplied allocations')
-    }
   }
 
 

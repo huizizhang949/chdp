@@ -11,12 +11,19 @@
 #' @export
 #'
 #' @examples cluster_size(opt_cl = opt_cl, data_names = c('data1', 'data2'))
-cluster_size <- function(opt_cl, data_names){
+cluster_size <- function(opt_cl, data_names=NULL){
 
   # number of identified clusters
   J <- length(unique(unlist(opt$opt_cl)))
   # cluster size
   cl_size <- table(unlist(opt$opt_cl))
+  # number of datasets
+  D <- length(opt_cl)
+
+  if(is.null(data_names)){
+    data_names <- paste0('data ',1:D)
+  }
+
   # plot
   p1 <- ggplot(data = data.frame(cluster=factor(1:J),size=as.numeric(unname(cl_size))),aes(x=cluster,y=size))+
     geom_bar(stat = 'identity',fill="steelblue")+

@@ -4,7 +4,7 @@
 \alias{gkernelHDP_mcmc}
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
-gkernelHDP_mcmc(Y, t, J, niter, burn_in = 1000, thinning = 1,
+gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
     quadratic = FALSE, MH.variance = 0.01,
@@ -19,7 +19,7 @@ Both datasets should share the same set of genes.}
 
 \item{t}{a list of two vectors. Each vector is the external covariate (latent time) for individual dataset.}
 
-\item{J}{integer. Truncation level, i.e., the number of clusters to be found.}
+\item{J}{integer. Truncation level, i.e., the number of clusters to be found. Only required when estimating \code{Z}.}
 
 \item{niter}{integer. Total number of MCMC iterations.}
 
@@ -34,7 +34,8 @@ If \code{Z_fix} is not provided and \code{empirical_z=TRUE}, t-sne is first perf
 the combined datasets into two dimensions, and k-means is applied to find \eqn{J} clusters on
 the lower-dimensional embeddings. If \code{empirical_z=FALSE}, clusters are randomly initialized.}
 
-\item{Z_fix}{optional. Should be provided when \code{empirical_z} is not. Typically used in the
+\item{Z_fix}{optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
+where each vector stores the allocations in one dataset. Typically used in the
 post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.}
 
 \item{b_initial}{optional. Initial values for \eqn{\mathbf{b}}. If not provided, empirical values will be used.}
@@ -97,6 +98,6 @@ algorithm provides posterior samples for all parameters including cluster alloca
 used in the post-processing step to fix allocations to the optimal clustering, in order to infer cluster-specific parameters.
 }
 \examples{
-gkernelHDP_mcmc(Y = list(t(y1), t(y2)), t = list(t1, t2), J = 4,
-                niter = Depth, burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
+gkernelHDP_mcmc(Y = list(t(y1), t(y2)), t = list(t1, t2), J = 4, niter = 1000,
+                burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
 }

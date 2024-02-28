@@ -17,7 +17,8 @@ plot_consensus(Ws, Ds, psm_list)
 two line plots. The first plot shows mean absolute difference between different depths, the second for different widths.
 }
 \description{
-Compute mean absolute difference in posterior similarity matrices between difference values of widths (or depths) and draw line plots
+Compute mean absolute difference in posterior similarity matrices between difference values
+of widths (or depths) and draw line plots.
 }
 \examples{
 plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
