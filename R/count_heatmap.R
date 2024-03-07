@@ -127,18 +127,18 @@ latent_counts_heatmap <- function(Y_latent, opt_cl, global_output){
     return(unlist(temp))
   }))
 
-  # remove those indices separateing clusters
+  # remove those indices separating clusters
   cl_size_by_latent_d_cum <- cumsum(cl_size_by_latent_d)
   cl_size_by_latent_d_cum <- setdiff(cl_size_by_latent_d_cum, cl_size_cum)
   cum_prop_d <- cl_size_by_latent_d_cum/ncol(Y_latent_all)
 
-  heatmap_obs <- pheatmap(log(Y_latent_all+1),scale = "none",cluster_rows  = FALSE,
+  heatmap_latent <- pheatmap(log(Y_latent_all+1),scale = "none",cluster_rows  = FALSE,
                           cluster_cols = FALSE,
                           angle_col = 90,fontsize = 8,border_color=NA,color = my_latentPalette(n=400),
-                          main = 'Observed counts',silent = T)
+                          main = 'Latent counts',silent = T)
 
   grid::grid.newpage()
-  grid::grid.draw(heatmap_obs$gtable)
+  grid::grid.draw(heatmap_latent$gtable)
   grid::downViewport("matrix.4-3-4-3")
   # vertical solid line to separate clusters
   for (i in 1:length(cum_prop[-J])) {

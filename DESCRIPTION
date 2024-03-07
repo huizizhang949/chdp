@@ -47,4 +47,5 @@ Imports:
     data.table,
     RColorBrewer,
     grid,
-    ggplotify
+    ggplotify,
+    reshape2

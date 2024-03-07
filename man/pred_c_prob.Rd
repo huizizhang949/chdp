@@ -2,13 +2,28 @@
 % Please edit documentation in R/predict_var.R
 \name{pred_c_prob}
 \alias{pred_c_prob}
-\title{Title}
+\title{Compute covariate-dependent probabilities for future time points}
 \usage{
 pred_c_prob(post_result, t_pred, mc.cores = 8)
 }
 \arguments{
-\item{mc.cores}{}
+\item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
+
+\item{t_pred}{a vector of future time points.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
+}
+\value{
+a list of three components:
+\item{pt_obs}{posterior samples of covariate-dependent time probabilities for the observed time,
+simply \code{P_C_J_D_output} in \code{post_result}.}
+\item{t_pred}{a vector of future time points.}
+\item{pt_predict}{samples of covariate-dependent time probabilities for future time points.}
 }
 \description{
-Title
+This function calculates time-dependent probabilities of belonging to each cluster for future
+time points.
+}
+\examples{
+pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = c(1.1,1.2), mc.cores = 2)
 }

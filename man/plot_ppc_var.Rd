@@ -2,13 +2,22 @@
 % Please edit documentation in R/ppc_var.R
 \name{plot_ppc_var}
 \alias{plot_ppc_var}
-\title{Title}
+\title{Plot posterior predictive checks}
 \usage{
 plot_ppc_var(ppc_var_output, Y)
 }
 \arguments{
-\item{Y}{}
+\item{ppc_var_output}{output from \code{ppc_var}.}
+
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
+}
+\value{
+plots for each dataset, showing posterior means in red solid lines, credible intervals in red area,
+and observed data in black.
 }
 \description{
-Title
+This function plots the posterior mean of the replicated datasets and credible intervals.
+}
+\examples{
+plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 }

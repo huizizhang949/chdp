@@ -2,13 +2,31 @@
 % Please edit documentation in R/predict_var.R
 \name{pred_trend}
 \alias{pred_trend}
-\title{Title}
+\title{Predictions of future trends}
 \usage{
 pred_trend(post_result, Y, t_pred, prob = c(0.005, 0.995), mc.cores = 8)
 }
 \arguments{
-\item{mc.cores}{}
+\item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
+
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
+
+\item{t_pred}{a vector of future time points.}
+
+\item{prob}{probability corresponding to the credible interval.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
+}
+\value{
+a list of three components:
+\item{t_pred}{a vector of future time points.}
+\item{Y.pred.mean}{a dataframe of posterior predictive means.}
+\item{quantiles}{a list of dataframes of credible intervals for the predicted values. Each dataframe corresponds to one feature.}
 }
 \description{
-Title
+This function predicts future observations, and computes credible intervals.
+}
+\examples{
+pred_trend_result <- pred_trend(post_result = post_result, Y=list(Y1,Y2), t_pred = c(1.1,1.2),
+                                prob = c(0.005,0.995), mc.cores = 2)
 }

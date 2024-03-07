@@ -2,7 +2,7 @@
 % Please edit documentation in R/conditional_mean.R
 \name{conditional_mean}
 \alias{conditional_mean}
-\title{Title}
+\title{Compute conditional mean in the VAR likelihood}
 \usage{
 conditional_mean(
   Y,
@@ -14,8 +14,28 @@ conditional_mean(
 )
 }
 \arguments{
-\item{prob}{}
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
+
+\item{t}{a list of two vectors. Each vector is the external covariate (time) for individual dataset.}
+
+\item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}
+
+\item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
+
+\item{prob}{probability corresponding to the credible interval.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
+}
+\value{
+a list of three components:
+\item{Y_df}{a dataframe combining observations, optimal clustering and time across datasets.}
+\item{Y_conditional_mean}{a dataframe of posterior mean of the conditional mean.}
+\item{quantiles}{a list of dataframes of credible intervals for the conditional mean. Each dataframe corresponds to one feature.}
 }
 \description{
-Title
+This function calculates the mean conditional on the past observation as well as credible intervals
+}
+\examples{
+conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, post_result = post_result,
+                                            prob = c(0.005,0.995), mc.cores = 2)
 }

@@ -2,13 +2,24 @@
 % Please edit documentation in R/predict_var.R
 \name{plot_pred_trend}
 \alias{plot_pred_trend}
-\title{Title}
+\title{Plot future predictions}
 \usage{
 plot_pred_trend(pred_trend_output, Y, t_obs)
 }
 \arguments{
-\item{t_obs}{}
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
+
+\item{t_obs}{a list of two vectors. Each vector contains the time for individual observed dataset.}
+
+\item{pred_trend_result}{output from \code{pred_trend}.}
+}
+\value{
+plots for each dataset, showing posterior predictive means in red solid lines, credible intervals in red area,
+and observed data in black.
 }
 \description{
-Title
+This function plots future trends and associated credible intervals.
+}
+\examples{
+plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = list(t1,t2))
 }

@@ -2,7 +2,7 @@
 % Please edit documentation in R/ppc_var.R
 \name{ppc_var}
 \alias{ppc_var}
-\title{Title}
+\title{Perform posterior predictive checks}
 \usage{
 ppc_var(
   post_result,
@@ -15,8 +15,30 @@ ppc_var(
 )
 }
 \arguments{
-\item{mc.cores}{}
+\item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
+
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
+
+\item{t}{a list of two vectors. Each vector is the external covariate (time) for individual dataset.}
+
+\item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}
+
+\item{number_rep}{number of replicates to generate.}
+
+\item{prob}{probability corresponding to the credible interval.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
+}
+\value{
+a list of two components:
+\item{Y.rep.mean}{a dataframe of means from replicated datasets.}
+\item{quantiles}{a list of dataframes of credible intervals for the replicates. Each dataframe corresponds to one feature.}
 }
 \description{
-Title
+This function generates replicated datasets for posterior predictive check, and computes
+the mean and credible intervals.
+}
+\examples{
+ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
+                          opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
 }

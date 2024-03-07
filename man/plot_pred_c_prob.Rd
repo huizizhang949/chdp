@@ -2,20 +2,38 @@
 % Please edit documentation in R/predict_var.R
 \name{plot_pred_c_prob}
 \alias{plot_pred_c_prob}
-\title{Title}
+\title{Plot samples of time-dependent probabilities for future time points}
 \usage{
 plot_pred_c_prob(
   pred_c_prob_output,
-  data,
   t_obs,
+  data,
   cluster,
   thinning = NULL,
   color_pal = NULL
 )
 }
 \arguments{
-\item{color_pal}{}
+\item{t_obs}{a list of two vectors. Each vector contains the time for individual observed dataset.}
+
+\item{data}{numeric value to indicate which dataset to visualize.}
+
+\item{cluster}{numeric value to indicate which cluster to visualize.}
+
+\item{thinning}{optional. If provided, apply thinning when plotting MCMC samples.}
+
+\item{color_pal}{optional. A vector of color names to map to clusters.}
+
+\item{pred_c_prob_result}{ouput from \code{pred_c_prob}.}
+}
+\value{
+plots showing the time-dependent probabilities for future time points in grey, and
+current time points in red, if \code{color_pal} is not provided.
 }
 \description{
-Title
+This function plots posterior samples of time-dependent probabilities for future time points
+and observed time points in the data.
+}
+\examples{
+plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
 }

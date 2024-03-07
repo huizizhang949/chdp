@@ -4,11 +4,12 @@
 #' This function shows the line plots of each feature against time, with observations colored by clustering, for each dataset.
 #'
 #'
-#' @param Y a list of two matrices for observations. The columns correspond to features.
+#' @param Y a list of two matrices for two datasets. The columns correspond to features.
 #' @param t a list of two vectors. Each vector is the external covariate (time) for individual dataset.
 #' @param opt_cl a list of vectors. Each vector stores the optimal clustering for one dataset.
 #' @param data_names optional. The labels for each dataset in the plot.
 #' @param color_pal optional. A vector of color names to map to clusters.
+#' @param nrow_legend number of rows in legend.
 #'
 #' @return Line plots for each dataset, showing each feature against time, and clusters.
 #' @export
@@ -35,7 +36,7 @@ plot_var_cluster <- function(Y, t, opt_cl, data_names=NULL, color_pal=NULL, nrow
   Y_df <- do.call(rbind,Y_df)
 
   # turn into a long format
-  Y_df_long <- reshape2::melt(df, id.vars = c('t','cluster','dataset'), variable.name = "y")
+  Y_df_long <- reshape2::melt(Y_df, id.vars = c('t','cluster','dataset'), variable.name = "y")
 
   gg <- ggplot(data=Y_df_long)+
     geom_line(aes(x=t,y=value),col='grey',linetype=1,linewidth=0.3)+

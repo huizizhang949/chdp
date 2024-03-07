@@ -1,15 +1,23 @@
-#' Title
+#' Predictions of future trends
 #'
-#' @param post_result
-#' @param Y
-#' @param t_pred
-#' @param prob
-#' @param mc.cores
+#' @description
+#' This function predicts future observations, and computes credible intervals.
 #'
-#' @return
+#' @param post_result output from \code{pkernelHDP_mcmc} for the post-processing step.
+#' @param Y a list of two matrices for two datasets. The columns correspond to features.
+#' @param t_pred a vector of future time points.
+#' @param prob probability corresponding to the credible interval.
+#' @param mc.cores number of cores used for parallel computing.
+#'
+#' @return a list of three components:
+#' \item{t_pred}{a vector of future time points.}
+#' \item{Y.pred.mean}{a dataframe of posterior predictive means.}
+#' \item{quantiles}{a list of dataframes of credible intervals for the predicted values. Each dataframe corresponds to one feature.}
 #' @export
 #'
 #' @examples
+#' pred_trend_result <- pred_trend(post_result = post_result, Y=list(Y1,Y2), t_pred = c(1.1,1.2),
+#'                                 prob = c(0.005,0.995), mc.cores = 2)
 pred_trend <- function(post_result, Y, t_pred, prob=c(0.005,0.995), mc.cores=8){
 
   L <- post_result$output_index
@@ -106,16 +114,21 @@ pred_trend <- function(post_result, Y, t_pred, prob=c(0.005,0.995), mc.cores=8){
 }
 
 
-#' Title
+#' Plot future predictions
 #'
-#' @param pred_trend_result
-#' @param Y
-#' @param t_obs
+#' @description
+#' This function plots future trends and associated credible intervals.
 #'
-#' @return
+#' @param pred_trend_result output from \code{pred_trend}.
+#' @param Y a list of two matrices for two datasets. The columns correspond to features.
+#' @param t_obs a list of two vectors. Each vector contains the time for individual observed dataset.
+#'
+#' @return plots for each dataset, showing posterior predictive means in red solid lines, credible intervals in red area,
+#' and observed data in black.
 #' @export
 #'
 #' @examples
+#' plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = list(t1,t2))
 plot_pred_trend <- function(pred_trend_output, Y, t_obs){
 
   t_pred <- pred_trend_output$t_pred
@@ -162,16 +175,25 @@ plot_pred_trend <- function(pred_trend_output, Y, t_obs){
 
 
 
-#' Title
+#' Compute covariate-dependent probabilities for future time points
 #'
-#' @param post_result
-#' @param t_pred
-#' @param mc.cores
+#' @description
+#' This function calculates time-dependent probabilities of belonging to each cluster for future
+#' time points.
 #'
-#' @return
+#' @param post_result output from \code{pkernelHDP_mcmc} for the post-processing step.
+#' @param t_pred a vector of future time points.
+#' @param mc.cores number of cores used for parallel computing.
+#'
+#' @return a list of three components:
+#' \item{pt_obs}{posterior samples of covariate-dependent time probabilities for the observed time,
+#' simply \code{P_C_J_D_output} in \code{post_result}.}
+#' \item{t_pred}{a vector of future time points.}
+#' \item{pt_predict}{samples of covariate-dependent time probabilities for future time points.}
 #' @export
 #'
 #' @examples
+#' pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = c(1.1,1.2), mc.cores = 2)
 pred_c_prob <- function(post_result, t_pred, mc.cores=8){
 
   L <- post_result$output_index
@@ -212,24 +234,30 @@ pred_c_prob <- function(post_result, t_pred, mc.cores=8){
 
   })
 
-  return(list(t_pred=t_pred,pt_predict=pt_predict,pt_obs=post_result$P_C_J_D_output))
+  return(list(pt_obs=post_result$P_C_J_D_output,t_pred=t_pred,pt_predict=pt_predict))
 }
 
 
-#' Title
+#' Plot samples of time-dependent probabilities for future time points
 #'
-#' @param pred_c_prob_result
-#' @param data
-#' @param t_obs
-#' @param cluster
-#' @param thinning
-#' @param color_pal
+#' @description
+#' This function plots posterior samples of time-dependent probabilities for future time points
+#' and observed time points in the data.
 #'
-#' @return
+#' @param pred_c_prob_result ouput from \code{pred_c_prob}.
+#' @param t_obs a list of two vectors. Each vector contains the time for individual observed dataset.
+#' @param data numeric value to indicate which dataset to visualize.
+#' @param cluster numeric value to indicate which cluster to visualize.
+#' @param thinning optional. If provided, apply thinning when plotting MCMC samples.
+#' @param color_pal optional. A vector of color names to map to clusters.
+#'
+#' @return plots showing the time-dependent probabilities for future time points in grey, and
+#' current time points in red, if \code{color_pal} is not provided.
 #' @export
 #'
 #' @examples
-plot_pred_c_prob <- function(pred_c_prob_output, data, t_obs, cluster, thinning=NULL, color_pal=NULL){
+#' plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
+plot_pred_c_prob <- function(pred_c_prob_output, t_obs, data, cluster, thinning=NULL, color_pal=NULL){
 
   pt_predict <- pred_c_prob_output$pt_predict
   t_pred <- pred_c_prob_output$t_pred

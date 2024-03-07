@@ -1,17 +1,25 @@
-#' Title
+#' Perform posterior predictive checks
 #'
-#' @param post_result
-#' @param Y
-#' @param t
-#' @param opt_cl
-#' @param number_rep
-#' @param prob
-#' @param mc.cores
+#' @description
+#' This function generates replicated datasets for posterior predictive check, and computes
+#' the mean and credible intervals.
 #'
-#' @return
+#' @param post_result output from \code{pkernelHDP_mcmc} for the post-processing step.
+#' @param Y a list of two matrices for two datasets. The columns correspond to features.
+#' @param t a list of two vectors. Each vector is the external covariate (time) for individual dataset.
+#' @param opt_cl a list of vectors. Each vector stores the optimal clustering for one dataset.
+#' @param number_rep number of replicates to generate.
+#' @param prob probability corresponding to the credible interval.
+#' @param mc.cores number of cores used for parallel computing.
+#'
+#' @return a list of two components:
+#' \item{Y.rep.mean}{a dataframe of means from replicated datasets.}
+#' \item{quantiles}{a list of dataframes of credible intervals for the replicates. Each dataframe corresponds to one feature.}
 #' @export
 #'
 #' @examples
+#' ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
+#'                           opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
 ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=c(0.005,0.995), mc.cores=8){
 
   L <- post_result$output_index
@@ -86,15 +94,21 @@ ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=c(0.005,0.995), 
 }
 
 
-#' Title
+#' Plot posterior predictive checks
 #'
-#' @param ppc_var_output
-#' @param Y
+#' @description
+#' This function plots the posterior mean of the replicated datasets and credible intervals.
 #'
-#' @return
+#'
+#' @param ppc_var_output output from \code{ppc_var}.
+#' @param Y a list of two matrices for two datasets. The columns correspond to features.
+#'
+#' @return plots for each dataset, showing posterior means in red solid lines, credible intervals in red area,
+#' and observed data in black.
 #' @export
 #'
 #' @examples
+#' plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 plot_ppc_var <- function(ppc_var_output, Y){
 
   D <- length(Y)

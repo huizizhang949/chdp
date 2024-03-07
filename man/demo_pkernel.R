@@ -62,37 +62,45 @@ save(post_result,file='man/post_result_var.RData')
 # remove the time for the first observation (not clustered)
 plot_c_prob(post_result = post_result, opt_cl = opt_cl, t = list(t1[-1], t2[-1]), mfrow = c(1,2),
             data_names = c('data 1', 'data 2'), xlab = 't', thinning = 5, plot.empty.cluster = TRUE,
-            truth = list(p_j1[,c(2,1)], p_j2[,c(2,1)]), color_pal = c25)
+            truth = list(p_j1[,c(2,1)], p_j2[,c(2,1)]))
 
 
-
+# ------ conditional mean ------
+# calculates the mean conditional on the past observation as well as credible intervals
 conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, post_result = post_result,
                                             prob = c(0.005,0.995), mc.cores = 2)
 
+# plots the posterior mean and credible intervals for the conditional mean
 plot_conditional_mean(conditional_mean_output = conditional_mean_result, data = 1, cluster = 1)
 
 
 
 # ----- prediction ----------
+# predict future observations, and computes credible intervals.
 set.seed(2)
 pred_trend_result <- pred_trend(post_result = post_result, Y=list(Y1,Y2),
                                 t_pred = seq(1,1.5,by=diff(t1)[1]), prob = c(0.005,0.995), mc.cores = 2)
 
+# plot posterior predictive means and associated credible intervals, in addition to observed data (black), for each feature.
 plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = list(t1,t2))
 
 
+# calculate time-dependent probabilities of belonging to each cluster for future time points
 pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = seq(1,1.5,by=diff(t1)[1]), mc.cores = 2)
 
-plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, data = 1, t_obs = t1, cluster = 1, thinning = 5, color_pal = c25)
-
+# plot posterior samples of time-dependent probabilities for future time points and observed time points,
+# for the specified dataset and cluster
+plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
 
 
 # ------ posterior predictive check --------
+# generate multiple replicated datasets for posterior predictive check, and computes
+# the mean and credible intervals
 set.seed(2)
 ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
                           opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
 
-
+# plot observed data in black, and the posterior mean of the replicated datasets (red line) and credible intervals (red area)
 plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 
 

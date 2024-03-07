@@ -14,7 +14,7 @@ plot_var_cluster(
 )
 }
 \arguments{
-\item{Y}{a list of two matrices for observations. The columns correspond to features.}
+\item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
 
 \item{t}{a list of two vectors. Each vector is the external covariate (time) for individual dataset.}
 
@@ -23,6 +23,8 @@ plot_var_cluster(
 \item{data_names}{optional. The labels for each dataset in the plot.}
 
 \item{color_pal}{optional. A vector of color names to map to clusters.}
+
+\item{nrow_legend}{number of rows in legend.}
 }
 \value{
 Line plots for each dataset, showing each feature against time, and clusters.
