@@ -4,15 +4,16 @@
 #' This function plots covariate-dependent probabilities against the covariate
 #' based on the MCMC samples from the post-processing step.
 #'
+#' @importFrom graphics par lines
 #'
 #' @param post_result output from \code{gkernelHDP_mcmc} or \code{pkernelHDP_mcmc} where clustering is fixed to the optimal one.
 #' @param opt_cl optimal clustering used for the post-processing step.
 #' @param t a list of vectors. Each vector denotes the covariate in one dataset.
 #' @param mfrow parameter used to cut the plot window into subpanels
-#' @param data_names the labels for each dataset in the plot.
-#' @param xlab string. The label for x-axis in the plot.
-#' @param thinning if provided, apply thinning when plotting MCMC samples.
-#' @param truth a list of matrices. Each matrix stores the covariate-dependent probabilities for one dataset,
+#' @param data_names optional. The labels for each dataset in the plot.
+#' @param xlab (optional) string. The label for x-axis in the plot.
+#' @param thinning optional. If provided, apply thinning when plotting MCMC samples.
+#' @param truth optional. A list of matrices. Each matrix stores the true covariate-dependent probabilities for one dataset,
 #' where rows correspond to observations and columns correspond to clusters.
 #' @param plot.empty.cluster if \code{FALSE}, only plot for occupied clusters.
 #'
@@ -23,8 +24,9 @@
 #' plot_c_prob(post_result = post_result, opt_cl = opt$opt_cl, t = list(t1, t2),
 #'             mfrow = c(1,2), data_names = c('data1', 'data2'),
 #'             xlab = 't', thinning = 5, truth = list(p_j1, p_j2))
-plot_c_prob <- function(post_result, opt_cl, t, mfrow=c(2,2), data_names=NULL, xlab=NULL, thinning=NULL, truth=NULL,
-                       plot.empty.cluster=FALSE){
+plot_c_prob <- function(post_result, opt_cl, t, mfrow=c(2,2), data_names=NULL,
+                        xlab=NULL, thinning=NULL, truth=NULL, color_pal=NULL,
+                        plot.empty.cluster=FALSE){
 
   # number of clusters
   J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
@@ -61,10 +63,10 @@ plot_c_prob <- function(post_result, opt_cl, t, mfrow=c(2,2), data_names=NULL, x
            xlab=xlab, ylab='probability')
 
       for (i in ix) {
-        lines(sort(t[[d]]),post_result$P_C_J_D_output[[d]][[i]][o,j],col='grey')
+        lines(sort(t[[d]]),post_result$P_C_J_D_output[[d]][[i]][o,j],col=ifelse(is.null(color_pal),'grey',color_pal[j]))
       }
       if(!is.null(truth)){
-        lines(sort(t[[d]]),truth[[d]][o,j],col='red')
+        lines(sort(t[[d]]),truth[[d]][o,j],col='red', lwd=2)
       }
     }
   }

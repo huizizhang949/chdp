@@ -21,7 +21,7 @@ Xi_C_D_update_pkernel <- function(Q_J_D, C_d, t, mu_J_D, lambda_J_D, sigma_2_J_D
       log_pkernel_value <- val1*val2^2
 
       # vector of length = J
-      log_temp <- ln(Q_J_D[,d])+log_pkernel_value
+      log_temp <- log(Q_J_D[,d])+log_pkernel_value
       log_K <- max(log_temp)
 
       return(exp(log_K)*sum(exp(log_temp-log_K)))
@@ -53,7 +53,7 @@ Q_J_D_update_pkernel <- function(Z, alpha, P, Xi_C_D, t, mu_J_D, lambda_J_D, sig
       log_pkernel_value <- val1*val2^2
 
       # vector of length = C_d[[d]]
-      log_temp <- ln(Xi_C_D[[d]])+log_pkernel_value
+      log_temp <- log(Xi_C_D[[d]])+log_pkernel_value
       log_K <- max(log_temp)
 
       rate <- 1+exp(log_K)*sum(exp(log_temp-log_K))
@@ -106,7 +106,7 @@ allocation_variables_update_pkernel <- function(Y, X, t, L_1_J, Sigma_1_J, Q_J_D
         log_pkernel_value <- val1*val2^2
 
         lp_val <- mvnfast::dmvn(matrix(Y[[d]][cc,], nrow=1), mu=matrix(means_by_j[[d]][[j]][cc,], nrow=1), sigma = Sigma_1_J[[j]], log = TRUE)+
-          ln(Q_J_D[j,d]) + log_pkernel_value
+          log(Q_J_D[j,d]) + log_pkernel_value
 
         return(lp_val)
 
@@ -307,7 +307,7 @@ lambda_log_prob <- function(lambda_j_d, r_j, s_2, mu_j_d, sigma_2_j_d, t_c_d_sub
 
   lp2 <- sum(-xi_d*q_j_d*pkernel(t_d,mu_j_d,lambda_j_d,sigma_2_j_d))
 
-  lprod <- lp1-2*ln(lambda_j_d)-(ln(lambda_j_d)-r_j)^2/2/s_2+lp2
+  lprod <- lp1-2*log(lambda_j_d)-(log(lambda_j_d)-r_j)^2/2/s_2+lp2
 
   return(lprod)
 }
@@ -400,7 +400,7 @@ sigma_2_J_D_update <- function(h_J, m_2, Z, t, mu_J_D, lambda_J_D, U_C_J_D, Xi_C
     for (j in 1:J) {
       # Compute truncation region if needed
       # Find which cells to truncate regions
-      ind <- c(1:C_d[d])[-ln(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
+      ind <- c(1:C_d[d])[-log(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
       if(length(ind)==0) {
         truncate <- FALSE
       }else{
@@ -408,7 +408,7 @@ sigma_2_J_D_update <- function(h_J, m_2, Z, t, mu_J_D, lambda_J_D, U_C_J_D, Xi_C
 
         val <- sin((t[[d]]-mu_J_D[j,d])/lambda_J_D[j,d])
 
-        uppers <- -2*val^2/(ln(-ln(U_C_J_D[[d]][,j]))-ln(Xi_C_D[[d]])-ln(Q_J_D[j,d]))
+        uppers <- -2*val^2/(log(-log(U_C_J_D[[d]][,j]))-log(Xi_C_D[[d]])-log(Q_J_D[j,d]))
         upper <- min(uppers[ind])
       }
 
@@ -468,7 +468,7 @@ r_J_update_pkernel <- function(lambda_J_D, mu_r, sigma_r, s_2){
 
   # Update
   r_J <- sapply(1:J, function(j) {
-    mu_r_hat <- (mu_r*s_2+sigma_r^2*sum(ln(lambda_J_D[j,])))/(s_2+D*sigma_r^2)
+    mu_r_hat <- (mu_r*s_2+sigma_r^2*sum(log(lambda_J_D[j,])))/(s_2+D*sigma_r^2)
     sigma_r_2_hat <- sigma_r^2*s_2/(s_2+D*sigma_r^2)
     return(rnorm(1, mean = mu_r_hat, sd = sqrt(sigma_r_2_hat)))
   })
@@ -485,7 +485,7 @@ s_2_update_pkernel <- function(lambda_J_D, eta_1, eta_2, r_J){
   shape <- J*D/2+eta_1
 
   temp <- sapply(1:D, function(d) {
-    return(ln(lambda_J_D[,d])-r_J)
+    return(log(lambda_J_D[,d])-r_J)
   })
 
   rate <- eta_2+sum(temp^2)/2
@@ -500,7 +500,7 @@ h_log_prob <- function(h_j,m_2,sigma_2_d, mu_h, sigma_h){
 
   a_j <- 2+h_j^2/m_2; b_j <- h_j+h_j^3/m_2
   D <- length(sigma_2_d)
-  lp <- a_j*D*ln(b_j)-D*lgamma(a_j)-(a_j+1)*sum(ln(sigma_2_d))-b_j*sum(1/sigma_2_d)-ln(h_j)-(ln(h_j)-mu_h)^2/2/sigma_h^2
+  lp <- a_j*D*log(b_j)-D*lgamma(a_j)-(a_j+1)*sum(log(sigma_2_d))-b_j*sum(1/sigma_2_d)-log(h_j)-(log(h_j)-mu_h)^2/2/sigma_h^2
 
   return(lp)
 }
@@ -571,10 +571,10 @@ m_2_log_prob <- function(m_2,h_J,sigma_2_J_D,kappa_1,kappa_2){
     h_j <- h_J[j]; sigma_2_d <- sigma_2_J_D[j,]
     a_j <- 2+h_j^2/m_2; b_j <- h_j+h_j^3/m_2
 
-    a_j*D*ln(b_j)-D*lgamma(a_j)-(a_j+1)*sum(ln(sigma_2_d))-b_j*sum(1/sigma_2_d)
+    a_j*D*log(b_j)-D*lgamma(a_j)-(a_j+1)*sum(log(sigma_2_d))-b_j*sum(1/sigma_2_d)
   })
 
-  lp <- sum(temp)-(kappa_1+1)*ln(m_2)-kappa_2/m_2
+  lp <- sum(temp)-(kappa_1+1)*log(m_2)-kappa_2/m_2
 
 }
 

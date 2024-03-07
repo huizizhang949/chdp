@@ -4,7 +4,7 @@
 \alias{latent_count}
 \title{Compute posterior mean of latent counts}
 \usage{
-latent_count(post_result, Y, opt_cl)
+latent_count(post_result, Y, opt_cl, mc.cores = 8)
 }
 \arguments{
 \item{post_result}{output from \code{gkernelHDP_mcmc} for the post-processing step.}
@@ -12,12 +12,14 @@ latent_count(post_result, Y, opt_cl)
 \item{Y}{a list of matrices. Each matrix is a gene-by-cell matrix of mRNA counts corresponding to a dataset.}
 
 \item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
 }
 \value{
 a list of matrices, each is a gene-by-cell matrix of posterior mean of latent counts for a dataset.
 }
 \description{
-Compute posterior mean of latent counts
+The function computes the posterior mean of latent counts, based on allocations.
 }
 \examples{
 latent_count(post_result = post_result, Y = list(t(y1), t(y2)), opt_cl = opt_cl)

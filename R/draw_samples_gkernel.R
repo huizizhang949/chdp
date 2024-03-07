@@ -17,7 +17,7 @@ Xi_C_D_update_gkernel <- function(Q_J_D, C_d, t, t_star_J_D, sigma_star_2_J_D){
     rates <- vapply(1:C_d[d], function(c) {
       log_rbf_value <-
         -(t[[d]][c] - t_star_J_D[, d]) ^ 2 / 2 / sigma_star_2_J_D[, d]
-      log_temp <- ln(Q_J_D[, d]) + log_rbf_value
+      log_temp <- log(Q_J_D[, d]) + log_rbf_value
       log_K <- max(log_temp)
 
       return(exp(log_K) * sum(exp(log_temp - log_K)))
@@ -44,7 +44,7 @@ Q_J_D_update_gkernel <- function(Z, alpha, P, Xi_C_D, t, t_star_J_D, sigma_star_
       shape <- sum(Z[[d]]==j)+alpha*P[j]
 
       log_rbf_value <- -(t[[d]]-t_star_J_D[j,d])^2/2/sigma_star_2_J_D[j,d]
-      log_temp <- ln(Xi_C_D[[d]])+log_rbf_value
+      log_temp <- log(Xi_C_D[[d]])+log_rbf_value
       log_K <- max(log_temp)
       rate <- 1+exp(log_K)*sum(exp(log_temp-log_K))
 
@@ -83,7 +83,7 @@ allocation_variables_update_gkernel <- function(Y, t, mu_star_1_J, phi_star_1_J,
       LP <- vapply(1:J, function(j) {
 
         sum(dnbinom(Y[[d]][,c], mu = mu_star_1_J[j,]*Beta[[d]][c], size = phi_star_1_J[j,], log = TRUE)) +
-          ln(Q_J_D[j,d]) - (t[[d]][c]-t_star_J_D[j,d])^2/2/sigma_star_2_J_D[j,d]
+          log(Q_J_D[j,d]) - (t[[d]][c]-t_star_J_D[j,d])^2/2/sigma_star_2_J_D[j,d]
 
       }, FUN.VALUE = numeric(1))
 
@@ -137,14 +137,14 @@ t_star_J_D_update <- function(r_J, s_2, Z, t, C_d, sigma_star_2_J_D, U_C_J_D, Xi
   for (d in 1:D) {
     for (j in 1:J){
       # Find which cells to truncate regions
-      ind <- c(1:C_d[d])[-ln(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
+      ind <- c(1:C_d[d])[-log(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
       if(length(ind)==0) {
         truncate <- FALSE
       }else{
         # If truncate, find truncated regions
         truncate <- TRUE
         i_all_complement <- lapply(ind, function(c) {
-          temp <- -2*sigma_star_2_J_D[j,d]*(ln(-ln(U_C_J_D[[d]][c,j]))-ln(Xi_C_D[[d]][c])-ln(Q_J_D[j,d]))
+          temp <- -2*sigma_star_2_J_D[j,d]*(log(-log(U_C_J_D[[d]][c,j]))-log(Xi_C_D[[d]][c])-log(Q_J_D[j,d]))
 
           i_complement <- sets::interval(t[[d]][c]-sqrt(temp), t[[d]][c]+sqrt(temp), '[]')
           return(i_complement)
@@ -178,7 +178,7 @@ t_star_J_D_update <- function(r_J, s_2, Z, t, C_d, sigma_star_2_J_D, U_C_J_D, Xi
           }else if(is.infinite(upper)){
             log_p <- c(log_p,pnorm(lower, mean = r_j_hat, sd = sqrt(s_2_hat), log.p = TRUE, lower.tail = FALSE))
           }else{
-            log_p <- c(log_p,ln(pnorm(upper, mean = r_j_hat, sd = sqrt(s_2_hat))-
+            log_p <- c(log_p,log(pnorm(upper, mean = r_j_hat, sd = sqrt(s_2_hat))-
                                   pnorm(lower, mean = r_j_hat, sd = sqrt(s_2_hat))))
           }
         }
@@ -202,7 +202,7 @@ t_star_J_D_update <- function(r_J, s_2, Z, t, C_d, sigma_star_2_J_D, U_C_J_D, Xi
 
 # log(full conditional distribution)
 sigma_star_2_log_prob <- function(sigma_star_2_j_d, m_2, h_j, t_star_j_d, t_c_d_sub){
-  lprod <- -ln(sigma_star_2_j_d)-(ln(sigma_star_2_j_d)-h_j)^2/2/m_2-sum((t_c_d_sub-t_star_j_d)^2)/2/sigma_star_2_j_d
+  lprod <- -log(sigma_star_2_j_d)-(log(sigma_star_2_j_d)-h_j)^2/2/m_2-sum((t_c_d_sub-t_star_j_d)^2)/2/sigma_star_2_j_d
   return(lprod)
 }
 
@@ -236,12 +236,12 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
     for (j in 1:J) {
       # Compute truncation region if needed
       # Find which cells to truncate regions
-      ind <- c(1:C_d[d])[-ln(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
+      ind <- c(1:C_d[d])[-log(U_C_J_D[[d]][,j])<Xi_C_D[[d]]*Q_J_D[j,d]]
       if(length(ind)==0) {
         truncate <- FALSE
       }else{
         truncate <- TRUE
-        uppers <- -(t[[d]]-t_star_J_D[j,d])^2/2/(ln(-ln(U_C_J_D[[d]][,j]))-ln(Xi_C_D[[d]])-ln(Q_J_D[j,d]))
+        uppers <- -(t[[d]]-t_star_J_D[j,d])^2/2/(log(-log(U_C_J_D[[d]][,j]))-log(Xi_C_D[[d]])-log(Q_J_D[j,d]))
         upper <- min(uppers[ind])
       }
 
@@ -250,7 +250,7 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
         if(!truncate){
           # No truncation
           sigma_star_2_J_D_new[j,d] <- rlnorm(1, meanlog = h_J[j], sdlog = sqrt(m_2))
-          X_new[j,d] <- ln(sigma_star_2_J_D_new[j,d])
+          X_new[j,d] <- log(sigma_star_2_J_D_new[j,d])
 
           accept_count <- accept_count+1
         }else{
@@ -260,7 +260,7 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
           u <- runif(1, 0, p.upper)
           sigma_star_2_J_D_new[j,d] <- qlnorm(u, meanlog = h_J[j], sdlog = sqrt(m_2))
 
-          X_new[j,d] <- -ln(1/sigma_star_2_J_D_new[j,d] - 1/upper)
+          X_new[j,d] <- -log(1/sigma_star_2_J_D_new[j,d] - 1/upper)
 
           accept_count <- accept_count+1
         }
@@ -269,9 +269,9 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
         if(!truncate){
           # No truncation, perform adaptive MH directly, propose sigma_star_j_d from log-normal, X=log(sigma_star_2)
           if(n <= 100){
-            X_new[j,d] <- rnorm(n = 1, mean = ln(sigma_star_2_J_D_old[j,d]), sd = 0.1)
+            X_new[j,d] <- rnorm(n = 1, mean = log(sigma_star_2_J_D_old[j,d]), sd = 0.1)
           }else{
-            X_new[j,d] <- rnorm(n = 1, mean = ln(sigma_star_2_J_D_old[j,d]), sd = sqrt(2.4^2*variance_old[j,d]+2.4^2*MH.variance))
+            X_new[j,d] <- rnorm(n = 1, mean = log(sigma_star_2_J_D_old[j,d]), sd = sqrt(2.4^2*variance_old[j,d]+2.4^2*MH.variance))
           }
 
           # Transform the new value of X back to new value of sigma_star_2_j_d
@@ -286,14 +286,14 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
                                                   t_c_d_sub = t_c_d_sub) -
             sigma_star_2_log_prob(sigma_star_2_j_d = sigma_star_2_J_D_old[j,d], m_2,
                                   h_J[j], t_star_J_D[j,d], t_c_d_sub) -
-            ln(sigma_star_2_J_D_old[j,d]) + ln(sigma_star_2_J_D_new[j,d])
+            log(sigma_star_2_J_D_old[j,d]) + log(sigma_star_2_J_D_new[j,d])
           acceptance_sigma <- exp(log_acceptance)
           acceptance_sigma <- min(1, acceptance_sigma)
 
           # Update sigma_star_2_J_D_new, X_new, X_mean_new, variance_new
           outcome <- rbinom(n = 1, size = 1, prob = acceptance_sigma)
           if(is.na(outcome) == TRUE | outcome == 0){
-            X_new[j,d] <- ln(sigma_star_2_J_D_old[j,d])
+            X_new[j,d] <- log(sigma_star_2_J_D_old[j,d])
             sigma_star_2_J_D_new[j,d] <- sigma_star_2_J_D_old[j,d]
           }else{
             accept_count <- accept_count+1
@@ -303,9 +303,9 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
           # Truncate
           # X = -log(1/sigma_star - 1/upper)
           if(n <= 100){
-            X_new[j,d] <- rnorm(n = 1, mean = -ln(1/sigma_star_2_J_D_old[j,d] - 1/upper), sd = 0.1)
+            X_new[j,d] <- rnorm(n = 1, mean = -log(1/sigma_star_2_J_D_old[j,d] - 1/upper), sd = 0.1)
           }else{
-            X_new[j,d] <- rnorm(n = 1, mean = -ln(1/sigma_star_2_J_D_old[j,d] - 1/upper), sd = sqrt(2.4^2*variance_old[j,d]+2.4^2*MH.variance))
+            X_new[j,d] <- rnorm(n = 1, mean = -log(1/sigma_star_2_J_D_old[j,d] - 1/upper), sd = sqrt(2.4^2*variance_old[j,d]+2.4^2*MH.variance))
           }
 
           # Transform the new value of X back to new value of sigma_star_2_j_d
@@ -323,8 +323,8 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
                                                   t_c_d_sub = t_c_d_sub) -
             sigma_star_2_log_prob(sigma_star_2_j_d = sigma_star_2_J_D_old[j,d], m_2,
                                   h_J[j], t_star_J_D[j,d], t_c_d_sub) -
-            ln(sigma_star_2_J_D_old[j,d]) - ln(upper-sigma_star_2_J_D_old[j,d]) +
-            ln(sigma_star_2_J_D_new[j,d]) + ln(upper-sigma_star_2_J_D_new[j,d])
+            log(sigma_star_2_J_D_old[j,d]) - log(upper-sigma_star_2_J_D_old[j,d]) +
+            log(sigma_star_2_J_D_new[j,d]) + log(upper-sigma_star_2_J_D_new[j,d])
 
           acceptance_sigma <- exp(log_acceptance)
           acceptance_sigma <- min(1, acceptance_sigma)
@@ -332,7 +332,7 @@ sigma_star_2_J_D_update <- function(sigma_star_2_J_D_old,h_J, m_2, Z, t, C_d, t_
           # Update sigma_star_2_J_D_new, X_new, X_mean_new, variance_new
           outcome <- rbinom(n = 1, size = 1, prob = acceptance_sigma)
           if(is.na(outcome) == TRUE | outcome == 0){
-            X_new[j,d] <- -ln(1/sigma_star_2_J_D_old[j,d] - 1/upper)
+            X_new[j,d] <- -log(1/sigma_star_2_J_D_old[j,d] - 1/upper)
             sigma_star_2_J_D_new[j,d] <- sigma_star_2_J_D_old[j,d]
           }else{
             accept_count <- accept_count+1
@@ -395,7 +395,7 @@ h_J_update_gkernel <- function(sigma_star_2_J_D, mu_h, sigma_h, m_2){
 
   # Update
   h_J <- sapply(1:J, function(j) {
-    mu_h_hat <- (mu_h*m_2+sigma_h^2*sum(ln(sigma_star_2_J_D[j,])))/(m_2+D*sigma_h^2)
+    mu_h_hat <- (mu_h*m_2+sigma_h^2*sum(log(sigma_star_2_J_D[j,])))/(m_2+D*sigma_h^2)
     sigma_h_2_hat <- sigma_h^2*m_2/(m_2+D*sigma_h^2)
     return(rnorm(1, mean = mu_h_hat, sd = sqrt(sigma_h_2_hat)))
   })
@@ -410,7 +410,7 @@ m_2_update_gkernel <- function(sigma_star_2_J_D, kappa_1, kappa_2, h_J){
   shape <- J*D/2+kappa_1
 
   temp <- sapply(1:D, function(d) {
-    return(ln(sigma_star_2_J_D[,d])-h_J)
+    return(log(sigma_star_2_J_D[,d])-h_J)
   })
 
   rate <- kappa_2+sum(temp^2)/2
@@ -427,9 +427,9 @@ component_log_prob <- function(P, Q_J_D, alpha_0, alpha){
   J <- nrow(Q_J_D)
   D <- ncol(Q_J_D)
 
-  lprod <- sum((alpha_0/J-1)*ln(P))
+  lprod <- sum((alpha_0/J-1)*log(P))
   for(d in 1:D){
-    lprod <- lprod + sum(alpha*P*ln(Q_J_D[,d])-lgamma(alpha*P))
+    lprod <- lprod + sum(alpha*P*log(Q_J_D[,d])-lgamma(alpha*P))
   }
 
   return(lprod)
@@ -449,7 +449,7 @@ component_probabilities_update <- function(P, Q_J_D, alpha_0, alpha, covariance,
   tilde_s_old <- tilde_s
   sd_P_old <- sd_P
 
-  X_old <- ln(P_old[1:(J-1)]/P_old[J]) # Length = J-1
+  X_old <- log(P_old[1:(J-1)]/P_old[J]) # Length = J-1
 
   # Iteration index
   n <- iter_num
@@ -467,7 +467,7 @@ component_probabilities_update <- function(P, Q_J_D, alpha_0, alpha, covariance,
   # Compute acceptance probability
   log_acceptance <- component_log_prob(P_new, Q_J_D, alpha_0, alpha) -
     component_log_prob(P_old, Q_J_D, alpha_0, alpha) +
-    sum(ln(P_new)-ln(P_old))
+    sum(log(P_new)-log(P_old))
   acceptance_P <- exp(log_acceptance)
   acceptance_P <- min(1, acceptance_P)
 
@@ -501,7 +501,7 @@ alpha_log_prob <- function(Q_J_D, P, alpha){
   D <- ncol(Q_J_D)
   # Construct the log-probability
   lprod <- -alpha + sum(vapply(1:D, function(d) {
-    sum(alpha*P*ln(Q_J_D[,d])-lgamma(alpha*P))
+    sum(alpha*P*log(Q_J_D[,d])-lgamma(alpha*P))
   }, FUN.VALUE = numeric(1)))
 
   return(lprod)
@@ -512,7 +512,7 @@ alpha_update <- function(Q_J_D, P, alpha, X_mean, M_2, variance, iter_num, MH.va
   D <- ncol(Q_J_D)
 
   # Define the inputs
-  alpha_old <- alpha; X_old <- ln(alpha_old)
+  alpha_old <- alpha; X_old <- log(alpha_old)
   X_mean_old <- X_mean
   M_2_old <- M_2
   variance_old <- variance
@@ -534,7 +534,7 @@ alpha_update <- function(Q_J_D, P, alpha, X_mean, M_2, variance, iter_num, MH.va
   # Compute log acceptance probability
   log_acceptance <- alpha_log_prob(Q_J_D, P, alpha = alpha_new) -
     alpha_log_prob(Q_J_D, P, alpha = alpha_old) +
-    ln(alpha_new) - ln(alpha_old)
+    log(alpha_new) - log(alpha_old)
   acceptance_alpha <- exp(log_acceptance)
   acceptance_alpha <- min(1, acceptance_alpha)
 
@@ -561,7 +561,7 @@ alpha_0_log_prob <- function(P,alpha_0){
 
   J <- length(P)
 
-  lprob <- -alpha_0 + lgamma(alpha_0) - J*lgamma(alpha_0/J) + sum(alpha_0/J*ln(P))
+  lprob <- -alpha_0 + lgamma(alpha_0) - J*lgamma(alpha_0/J) + sum(alpha_0/J*log(P))
 
   # Return the log-probability
   return(lprob)
@@ -572,7 +572,7 @@ alpha_0_update <- function(P, alpha_0, X_mean, M_2, variance, iter_num, MH.varia
   J <- length(P)
 
   # Define the inputs
-  alpha_0_old <- alpha_0; X_old <- ln(alpha_0_old)
+  alpha_0_old <- alpha_0; X_old <- log(alpha_0_old)
   variance_old <- variance
   M_2_old <- M_2
   X_mean_old <- X_mean
@@ -591,7 +591,7 @@ alpha_0_update <- function(P, alpha_0, X_mean, M_2, variance, iter_num, MH.varia
   # Compute acceptance probability
   log_acceptance <- alpha_0_log_prob(P,alpha_0 = alpha_0_new) -
     alpha_0_log_prob(P, alpha_0 = alpha_0_old) +
-    ln(alpha_0_new) - ln(alpha_0_old)
+    log(alpha_0_new) - log(alpha_0_old)
   acceptance_alpha0 <- exp(log_acceptance)
   acceptance_alpha0 <- min(1, acceptance_alpha0)
 
@@ -636,10 +636,10 @@ mean_dispersion <- function(mu_star_1_J, phi_star_1_J,m_b,v_1,v_2,quadratic=FALS
       # For posterior variance of b
       parameter0 <- parameter0 + t(mu_tilde_j)%*%(mu_tilde_j)
       # For posterior mean of b
-      parameter1 <- parameter1 + t(mu_tilde_j)%*%(matrix(ln(phi_star_1_J[j,]), nrow=G, ncol=1))
+      parameter1 <- parameter1 + t(mu_tilde_j)%*%(matrix(log(phi_star_1_J[j,]), nrow=G, ncol=1))
       # For scale parameter of IG prior for alpha_phi^2
-      parameter2 <- parameter2 + (matrix(ln(phi_star_1_J[j,]), nrow=1, ncol=G))%*%
-        (matrix(ln(phi_star_1_J[j,]), nrow=G, ncol=1))
+      parameter2 <- parameter2 + (matrix(log(phi_star_1_J[j,]), nrow=1, ncol=G))%*%
+        (matrix(log(phi_star_1_J[j,]), nrow=G, ncol=1))
     }
   }else{
     for(j in 1:J){
@@ -647,10 +647,10 @@ mean_dispersion <- function(mu_star_1_J, phi_star_1_J,m_b,v_1,v_2,quadratic=FALS
       # For posterior variance of b
       parameter0 <- parameter0 + t(mu_tilde_j)%*%(mu_tilde_j)
       # For posterior mean of b
-      parameter1 <- parameter1 + t(mu_tilde_j)%*%(matrix(ln(phi_star_1_J[j,]), nrow=G, ncol=1))
+      parameter1 <- parameter1 + t(mu_tilde_j)%*%(matrix(log(phi_star_1_J[j,]), nrow=G, ncol=1))
       # For scale parameter of IG prior for alpha_phi^2
-      parameter2 <- parameter2 + (matrix(ln(phi_star_1_J[j,]), nrow=1, ncol=G))%*%
-        (matrix(ln(phi_star_1_J[j,]), nrow=G, ncol=1))
+      parameter2 <- parameter2 + (matrix(log(phi_star_1_J[j,]), nrow=1, ncol=G))%*%
+        (matrix(log(phi_star_1_J[j,]), nrow=G, ncol=1))
     }
   }
 
@@ -684,19 +684,19 @@ unique_parameters_log_prob <- function(mu_star, phi_star, Z, b, alpha_phi_2, Y, 
   Y_c_g_d_j <- c(Y[[1]][g,which(Z[[1]]==j)], Y[[2]][g,which(Z[[2]]==j)])
 
   if(quadratic==FALSE){
-    lprod1 <- -ln(mu_star*phi_star) - 1/(2*alpha_mu_2)*(ln(mu_star))^2 -
-      (ln(phi_star)-(b[1]+b[2]*ln(mu_star)))^2/(2*alpha_phi_2)
+    lprod1 <- -log(mu_star*phi_star) - 1/(2*alpha_mu_2)*(log(mu_star))^2 -
+      (log(phi_star)-(b[1]+b[2]*log(mu_star)))^2/(2*alpha_phi_2)
   }else{
-    lprod1 <- -ln(mu_star*phi_star) - 1/(2*alpha_mu_2)*(ln(mu_star))^2 -
-      (ln(phi_star)-(b[1]+b[2]*ln(mu_star)+b[3]*(ln(mu_star))^2))^2/(2*alpha_phi_2)
+    lprod1 <- -log(mu_star*phi_star) - 1/(2*alpha_mu_2)*(log(mu_star))^2 -
+      (log(phi_star)-(b[1]+b[2]*log(mu_star)+b[3]*(log(mu_star))^2))^2/(2*alpha_phi_2)
   }
 
   if(length(Y_c_g_d_j) != 0){
     # Compute the log-probability
 
-    lprod2 <- sum(phi_star*ln(phi_star/(mu_star*B_c_d_j+phi_star)) +
+    lprod2 <- sum(phi_star*log(phi_star/(mu_star*B_c_d_j+phi_star)) +
                     lgamma(Y_c_g_d_j + phi_star) - lgamma(phi_star) - lgamma(Y_c_g_d_j+1) +
-                    Y_c_g_d_j*ln(mu_star/(mu_star*B_c_d_j+phi_star)))
+                    Y_c_g_d_j*log(mu_star/(mu_star*B_c_d_j+phi_star)))
     lprod <- lprod1 + lprod2
 
   }else{
@@ -708,7 +708,7 @@ unique_parameters_log_prob <- function(mu_star, phi_star, Z, b, alpha_phi_2, Y, 
 }
 
 unique_parameters_update <- function(mu_star_1_J, phi_star_1_J, mean_X_mu_phi, tilde_s_mu_phi,
-                                     J, G, Z, b, alpha_phi_2, Beta, alpha_mu_2, covariance, iter_num, quadratic=FALSE, Y,
+                                     J, G, Z, b, alpha_phi_2, Beta, alpha_mu_2, covariance, iter_num, quadratic, Y,
                                      MH.variance){
 
   # Create a matrix for mu_star_1_J to store simulated values for output
@@ -732,14 +732,18 @@ unique_parameters_update <- function(mu_star_1_J, phi_star_1_J, mean_X_mu_phi, t
     loop.result <- lapply(1:G, function(g) {
 
       # Transform into X
-      X_mu_phi_star_old <- c(ln(mu_star_1_J[j,g]),ln(phi_star_1_J[j,g]))
+      X_mu_phi_star_old <- c(log(mu_star_1_J[j,g]),log(phi_star_1_J[j,g]))
       mu_star_old <- mu_star_1_J[j,g]; phi_star_old <- phi_star_1_J[j,g]
 
       # If cluster j is empty with respect to all datasets, sample mu and phi from their priors
       if(sum(unlist(sapply(Z,function(l) l==j)))==0){
         mu_star_new <- rlnorm(1, meanlog = 0, sdlog = sqrt(alpha_mu_2))
-        phi_star_new <- rlnorm(1, meanlog = b[1]+b[2]*ln(mu_star_new), sdlog = sqrt(alpha_phi_2))
-        X_mu_phi_star_new <- c(ln(mu_star_new), ln(phi_star_new))
+        if(quadratic){
+          phi_star_new <- rlnorm(1, meanlog = b[1]+b[2]*log(mu_star_new)+b[3]*log(mu_star_new)^2, sdlog = sqrt(alpha_phi_2))
+        }else{
+          phi_star_new <- rlnorm(1, meanlog = b[1]+b[2]*log(mu_star_new), sdlog = sqrt(alpha_phi_2))
+        }
+        X_mu_phi_star_new <- c(log(mu_star_new), log(phi_star_new))
         accept <- 1
 
       }else{
@@ -762,8 +766,8 @@ unique_parameters_update <- function(mu_star_1_J, phi_star_1_J, mean_X_mu_phi, t
                                                                        Z, b, alpha_phi_2, Y, Beta, j, g, alpha_mu_2, quadratic = quadratic))) -
             sum(unlist(unique_parameters_log_prob(mu_star = mu_star_old, phi_star = phi_star_old,
                                                   Z, b, alpha_phi_2, Y, Beta, j, g, alpha_mu_2,  quadratic = quadratic))) -
-            ln(mu_star_old) -ln(phi_star_old) +
-            ln(mu_star_new) + ln(phi_star_new)
+            log(mu_star_old) -log(phi_star_old) +
+            log(mu_star_new) + log(phi_star_new)
 
           acceptance_unique <- min(1, exp(acceptance_prob_log))
 
@@ -826,8 +830,8 @@ capture_efficiencies_log_prob <- function(Beta_single, Y, Z, mu_star_1_J, phi_st
 
   j <- Z[[d]][c]
   # Construct the log-probability
-  lprod1 <- (a_d_beta[d]-1)*ln(Beta_single) + (b_d_beta[d]-1)*ln(1-Beta_single)
-  lprod2 <- sum((phi_star_1_J[j,]+Y[[d]][,c])*ln(phi_star_1_J[j,]+mu_star_1_J[j,]*Beta_single) - Y[[d]][,c]*ln(Beta_single))
+  lprod1 <- (a_d_beta[d]-1)*log(Beta_single) + (b_d_beta[d]-1)*log(1-Beta_single)
+  lprod2 <- sum((phi_star_1_J[j,]+Y[[d]][,c])*log(phi_star_1_J[j,]+mu_star_1_J[j,]*Beta_single) - Y[[d]][,c]*log(Beta_single))
   lprod <- lprod1 - lprod2
 
   return(lprod)
@@ -858,7 +862,7 @@ capture_efficiencies_update <- function(Beta, Y, Z, mu_star_1_J, phi_star_1_J, a
     loop.result <- lapply(1:C_d[d], function(c) {
 
       Beta_single_old <- Beta[[d]][c]
-      X_old <- ln(Beta_single_old/(1-Beta_single_old))
+      X_old <- log(Beta_single_old/(1-Beta_single_old))
 
       if(n <= 100){
         X_new <- rnorm(n = 1, mean = X_old, sd = 0.1)
@@ -876,8 +880,8 @@ capture_efficiencies_update <- function(Beta, Y, Z, mu_star_1_J, phi_star_1_J, a
       acceptance_prob_log <- capture_efficiencies_log_prob(Beta_single = Beta_single_new, Y, Z, mu_star_1_J,
                                                            phi_star_1_J, c, d, a_d_beta, b_d_beta) -
         capture_efficiencies_log_prob(Beta_single = Beta_single_old, Y, Z, mu_star_1_J, phi_star_1_J,
-                                      c, d, a_d_beta, b_d_beta) + ln(Beta_single_new) + ln(1-Beta_single_new) -
-        ln(Beta_single_old) - ln(1-Beta_single_old)
+                                      c, d, a_d_beta, b_d_beta) + log(Beta_single_new) + log(1-Beta_single_new) -
+        log(Beta_single_old) - log(1-Beta_single_old)
 
       acceptance_beta <- min(1, exp(acceptance_prob_log))
 

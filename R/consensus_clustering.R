@@ -132,11 +132,11 @@ plot_consensus <- function(Ws, Ds, psm_list){
 opt_cl_consensus <- function(Width, Depth, consensus_result){
 
   # size of each data
-  C <- lapply(consensus_result[[1]]$Z_output[[1]],length)
+  C <- sapply(consensus_result[[1]]$Z_output[[1]],length)
   # number of datasets
   D <- length(consensus_result[[1]]$Z_output[[1]])
 
-  C_cum <- c(0,cumsum(C))
+  n_cum <- c(0,cumsum(C))
 
   # MCMC samples from the given width and depth
   mcmc_z_result <- t(sapply(1:max(Width), function(w) {
@@ -153,7 +153,7 @@ opt_cl_consensus <- function(Width, Depth, consensus_result){
   # get the optimal clustering for each dataset
   opt_cl <- NULL
   for(d in 1:D){
-    opt_cl[[d]] <- VI_test[(C_cum[d]+1):C_cum[d+1]]
+    opt_cl[[d]] <- VI_test[(n_cum[d]+1):n_cum[d+1]]
   }
 
   return(list(opt_cl=opt_cl, psm=psm))

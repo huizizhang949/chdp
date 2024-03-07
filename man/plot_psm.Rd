@@ -22,5 +22,5 @@ Produce a heatmap of posterior similarity matrix showing both within-dataset and
 where data points are ordered by hierarchical clustering.
 }
 \examples{
-plot_psm(psm.tot = psm, size = c(120, 120))
+plot_psm(psm.tot = psm, size = C)
 }

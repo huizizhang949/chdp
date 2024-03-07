@@ -4,12 +4,14 @@
 \alias{cluster_size}
 \title{Produce a summary of cluster size}
 \usage{
-cluster_size(opt_cl, data_names = NULL)
+cluster_size(opt_cl, data_names = NULL, nrow = 1)
 }
 \arguments{
 \item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}
 
-\item{data_names}{the labels for each dataset in the plot.}
+\item{data_names}{optional. The labels for each dataset in the plot.}
+
+\item{nrow}{parameter used to cut the plot window into subpanels.}
 }
 \value{
 two bar plots. The first one shows the size of each cluster. The second one shows the proportion of each dataset

@@ -1,20 +1,23 @@
-#' Compute posterior probability of each cluster and plot
+#' Compute and plot cell-wise posterior probability of belonging to each cluster
 #'
 #' @description
 #' The function computes the posterior mean of the probability (PP) of belonging to each cluster, for every cell.
 #' Perform principal component analysis (PCA) on the combined data (concatenated along features) and plot first PC
 #' against the covariate.
 #'
-#' @importFrom pbmcapply pbmclapply
+#' @importFrom pbapply pblapply
+#' @importFrom ggpubr ggarrange
+#' @import ggplot2
+#'
 #' @param Y a list of matrices. Each matrix is a gene-by-cell matrix of mRNA counts corresponding to a dataset.
 #' @param t a list of covariates for each dataset.
 #' @param post_result output from \code{gkernelHDP_mcmc} for the post-processing step.
-#' @param data_names the labels for each dataset in the plot.
+#' @param data_names optional. The labels for each dataset in the plot.
 #' @param nrow parameter used to cut the plot window into subpanels.
 #' @param mc.cores number of cores used for parallel computing.
 #' @param size parameter used to control the point size in the plot.
 #' @param alpha parameter used to control the transparancy of the points in the plot.
-#' @param xlab string. The label for x-axis in the plot.
+#' @param xlab (optional) string. The label for x-axis in the plot.
 #'
 #' @return
 #' one plot for each datases that contains subpanels for clusters, showing PC1 against covariate with
@@ -27,7 +30,8 @@
 #' @examples
 #' plot_pp(post_result = post_result, Y= list(t(y1), t(y2)), t = list(t1, t2),
 #'         data_names = c('data1', 'data2'), nrow = 1, mc.cores = 4, xlab='t')
-plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1, mc.cores=8, size=1, alpha=1, xlab=NULL){
+plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1,
+                    mc.cores=8, size=1, alpha=1, xlab=NULL){
 
   Y_all <- t(do.call(cbind, Y))
   D <- length(Y)
@@ -44,7 +48,7 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1, mc.cores=8, size
     data_names <- paste0('data ',1:D)
   }
   # PCA
-  pc <- prcomp(Y_all,scale. = T)
+  pc <- stats::prcomp(Y_all,scale. = T)
 
   # separate by datasets
   C_cum <- c(0,cumsum(C))
@@ -58,8 +62,9 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1, mc.cores=8, size
   # compute posterior mean of the proabability
   PP_mean <- lapply(1:D, function(d) {
 
+    print(paste('Compute for data',d))
     # for each sample
-    PP_mcmc <- pbmclapply(ind, function(i) {
+    PP_mcmc <- pblapply(ind, function(i) {
 
       # a n_cell * J matrix
       loop.result <- vapply(1:C[d], function(cc) {
@@ -80,7 +85,7 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1, mc.cores=8, size
       }, FUN.VALUE = numeric(J))
 
       return(t(loop.result))
-    }, mc.cores = mc.cores)
+    }, cl = mc.cores)
 
     # average over all samples
     return(Reduce('+',PP_mcmc)/L)
@@ -96,7 +101,7 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1, mc.cores=8, size
         geom_point(size=size,alpha=alpha)+
         scale_colour_gradientn(colours = my_palette(n=400), limits=c(0, 1))+
         theme_bw()+
-        labs(title=paste('HET: Cluster',j), x=xlab)
+        labs(title=paste0(data_names[d],': Cluster',j), x=xlab)
     })
 
   })

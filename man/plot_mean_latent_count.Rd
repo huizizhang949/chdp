@@ -12,8 +12,7 @@ plot_mean_latent_count(
   xlab = NULL,
   data_names = NULL,
   gene_names = NULL,
-  nrow = 1,
-  mc.cores = 8
+  nrow = 1
 )
 }
 \arguments{
@@ -25,15 +24,13 @@ plot_mean_latent_count(
 
 \item{prob}{the target probability content of the interval.}
 
-\item{xlab}{string. The label for x-axis in the plot.}
+\item{xlab}{(optional) string. The label for x-axis in the plot.}
 
-\item{data_names}{the labels for each dataset in the plot.}
+\item{data_names}{optional. The labels for each dataset in the plot.}
 
-\item{gene_names}{the labels for each gene in the plot}
+\item{gene_names}{optional. The labels for each gene in the plot}
 
 \item{nrow}{parameter used to cut the plot window into subpanels.}
-
-\item{mc.cores}{number of cores used for parallel computing.}
 }
 \value{
 a lineplot showing posterior mean of mean latent count in black, and highest
@@ -47,5 +44,5 @@ mean latent count, and plots it versus covariate
 }
 \examples{
 plot_mean_latent_count(post_result = post_result, t = list(t1, t2), gene_ix = c(1,2),
-                       prob = 0.99, xlab='t', mc.cores = 4)
+                       prob = 0.99, xlab='t')
 }

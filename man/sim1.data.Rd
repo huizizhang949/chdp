@@ -5,13 +5,13 @@
 \alias{sim1.data}
 \title{Simulated data from negative binomial likelihood with a Gaussian kernel}
 \format{
-A matrix with 240 rows and 14 columns, with rows for observations (cells):
+A matrix with 500 rows and 105 columns, with rows for observations (cells):
 \describe{
 \enumerate{
-\item First 120 rows are from the first dataset, with the rest from the second dataset.
-\item First 10 columns correspond to genes.
-\item The last four columns denote cell allocations, latent time, and time-dependent probabilities
-of belonging to two clusters.
+\item First 200 rows are from the first dataset, with the rest from the second dataset.
+\item First 100 columns correspond to genes, where first 70 genes are global DE and DD genes.
+\item The last five columns denote cell allocations, latent time, and time-dependent probabilities
+of belonging to three clusters.
 }
 }
 }
@@ -19,8 +19,7 @@ of belonging to two clusters.
 sim1.data
 }
 \description{
-Two simulated datasets generated from a mixture of two binomial distributions with an overall mean of 0.6
-for capture efficiency. Both clusters are shared across two datasets. The Gaussian kernel is applied to introduce
-dependence on the external covariate (latent time).
+Two simulated datasets generated from a mixture of three binomial distributions with an overall mean of 0.6
+for capture efficiency. The Gaussian kernel is applied to introduce dependence on the external covariate (latent time).
 }
 \keyword{datasets}

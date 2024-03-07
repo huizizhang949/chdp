@@ -13,9 +13,9 @@ plot_tsne(Y, Y_latent, opt_cl, data_names = NULL, color_pal = NULL)
 
 \item{opt_cl}{a list of vectors. Each vector stores the optimal clustering for one dataset.}
 
-\item{data_names}{the labels for each dataset in the plot.}
+\item{data_names}{optional. The labels for each dataset in the plot.}
 
-\item{color_pal}{a vector of color names to map to clusters.}
+\item{color_pal}{optional. A vector of color names to map to clusters.}
 }
 \value{
 two plots showing t-sne representation of the observed counts (first) and latent counts (second),
@@ -25,5 +25,5 @@ where observations are colored by optimal clustering, and shaped by different da
 Plot observed and estimated latent counts on 2D using t-sne
 }
 \examples{
-plot_tsne(Y = list(t(y1), t(y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c16)
+plot_tsne(Y = list(t(y1), t(y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c15)
 }

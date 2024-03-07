@@ -5,7 +5,7 @@
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
 gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-    empirical = TRUE, empirical_z = NULL, Z_fix = NULL,
+    empirical = TRUE, empirical_z = TRUE, Z_fix = NULL,
     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
     quadratic = FALSE, MH.variance = 0.01,
     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
@@ -29,13 +29,12 @@ Both datasets should share the same set of genes.}
 
 \item{empirical}{logical. If TRUE, empirical values are used to set up the prior for \eqn{\alpha_{\phi}^2} and \eqn{\mathbf{b}}.}
 
-\item{empirical_z}{optional. Should be provided when \code{Z_fix} is not.
-If \code{Z_fix} is not provided and \code{empirical_z=TRUE}, t-sne is first performed to reduce
+\item{empirical_z}{if \code{Z_fix} is not provided and \code{empirical_z=TRUE}, t-sne is first performed to reduce
 the combined datasets into two dimensions, and k-means is applied to find \eqn{J} clusters on
 the lower-dimensional embeddings. If \code{empirical_z=FALSE}, clusters are randomly initialized.}
 
 \item{Z_fix}{optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
-where each vector stores the allocations in one dataset. Typically used in the
+where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
 post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.}
 
 \item{b_initial}{optional. Initial values for \eqn{\mathbf{b}}. If not provided, empirical values will be used.}
@@ -54,7 +53,7 @@ post-processing step where allocations are fixed to the optimal clustering to in
 
 \item{kappa_1, kappa_2}{shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.}
 
-\item{beta.mean}{an estimate of global mean capture efficiency across cells, default to 0.06.}
+\item{beta.mean}{an estimate of global mean capture efficiency across cells, default to be 0.06.}
 
 \item{alpha_mu_2}{optional. Prior variance for \eqn{\mu^*_{j,g}}. If not provided, empirical values will be used.}
 

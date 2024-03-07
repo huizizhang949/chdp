@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_pp.R
 \name{plot_pp}
 \alias{plot_pp}
-\title{Compute posterior probability of each cluster and plot}
+\title{Compute and plot cell-wise posterior probability of belonging to each cluster}
 \usage{
 plot_pp(
   post_result,
@@ -23,7 +23,7 @@ plot_pp(
 
 \item{t}{a list of covariates for each dataset.}
 
-\item{data_names}{the labels for each dataset in the plot.}
+\item{data_names}{optional. The labels for each dataset in the plot.}
 
 \item{nrow}{parameter used to cut the plot window into subpanels.}
 
@@ -33,7 +33,7 @@ plot_pp(
 
 \item{alpha}{parameter used to control the transparancy of the points in the plot.}
 
-\item{xlab}{string. The label for x-axis in the plot.}
+\item{xlab}{(optional) string. The label for x-axis in the plot.}
 }
 \value{
 one plot for each datases that contains subpanels for clusters, showing PC1 against covariate with

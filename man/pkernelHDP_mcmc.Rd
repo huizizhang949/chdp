@@ -2,14 +2,13 @@
 % Please edit documentation in R/pkernelHDP_mcmc.R
 \name{pkernelHDP_mcmc}
 \alias{pkernelHDP_mcmc}
-\title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across time-series data}
+\title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two time-series datasets based on VAR likelihood}
 \usage{
 pkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-    empirical_z = NULL, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
+    empirical_z = TRUE, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
     MH.variance = 0.01, target_accept = 0.234,
     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
-    sigma_h = 0.5, kappa_1 = 26, kappa_2 = 1, auto.save = FALSE,
-    partial.save.name = NULL, save_frequency = 100, save_ind = NULL)
+    sigma_h = 0.5, kappa_1 = 26, kappa_2 = 1)
 }
 \arguments{
 \item{Y}{a list of two matrices of dimension \eqn{C_d \times G}.
@@ -26,12 +25,11 @@ Both datasets should share the same set of features.}
 
 \item{thinning}{the thinning applied after burn-in period.}
 
-\item{empirical_z}{optional. Should be provided when \code{Z_fix} is not.
-If \code{Z_fix} is not provided and \code{empirical_z=TRUE}, a simple Gaussian mixture model
+\item{empirical_z}{if \code{Z_fix} is not provided and \code{empirical_z=TRUE}, a simple Gaussian mixture model
 is fitted using package \code{mclust}. If \code{empirical_z=FALSE}, clusters are randomly initialized.}
 
 \item{Z_fix}{optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
-where each vector stores the allocations in one dataset. Typically used in the
+where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
 post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.}
 
 \item{alpha_initial, alpha_0_initial}{initial values for concentration parameters \eqn{\alpha,\alpha_0}.}
@@ -47,14 +45,6 @@ post-processing step where allocations are fixed to the optimal clustering to in
 \item{mu_h, sigma_h}{mean and standard deviation of the hyper-prior (log-normal) for \eqn{h_j}.}
 
 \item{kappa_1, kappa_2}{shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.}
-
-\item{auto.save}{logical. Whether intermediate results should be saved during MCMC sampling.}
-
-\item{partial.save.name}{if \code{auto.save=TRUE}, the path and name to save the intermediate results.}
-
-\item{save_frequency}{if \code{auto.save=TRUE}, save the intermediate results every \code{save_frequency} iterations.}
-
-\item{save_ind}{optional. Used for consensus clustering, to save results at iteration index given by \code{save_ind} before burn-in.}
 }
 \value{
 \code{pkernelHDP_mcmc} returns a list containing the following components:

@@ -8,11 +8,10 @@
 #' @param t a list of covariates for each dataset.
 #' @param gene_ix index of genes to plot.
 #' @param prob the target probability content of the interval.
-#' @param xlab string. The label for x-axis in the plot.
-#' @param data_names the labels for each dataset in the plot.
-#' @param gene_names the labels for each gene in the plot
+#' @param xlab (optional) string. The label for x-axis in the plot.
+#' @param data_names optional. The labels for each dataset in the plot.
+#' @param gene_names optional. The labels for each gene in the plot
 #' @param nrow parameter used to cut the plot window into subpanels.
-#' @param mc.cores number of cores used for parallel computing.
 #'
 #' @return
 #' a lineplot showing posterior mean of mean latent count in black, and highest
@@ -23,9 +22,9 @@
 #'
 #' @examples
 #' plot_mean_latent_count(post_result = post_result, t = list(t1, t2), gene_ix = c(1,2),
-#'                        prob = 0.99, xlab='t', mc.cores = 4)
+#'                        prob = 0.99, xlab='t')
 plot_mean_latent_count <- function(post_result, t, gene_ix, prob=0.95,
-                                   xlab=NULL, data_names=NULL, gene_names=NULL, nrow=1, mc.cores=8){
+                                   xlab=NULL, data_names=NULL, gene_names=NULL, nrow=1){
 
   C <- sapply(t, length)
   L <- post_result$output_index
@@ -89,16 +88,21 @@ plot_mean_latent_count <- function(post_result, t, gene_ix, prob=0.95,
 
 #' Compute posterior mean of latent counts
 #'
+#' @description
+#' The function computes the posterior mean of latent counts, based on allocations.
+#'
+#' @importFrom pbapply pblapply
 #' @param post_result output from \code{gkernelHDP_mcmc} for the post-processing step.
 #' @param Y a list of matrices. Each matrix is a gene-by-cell matrix of mRNA counts corresponding to a dataset.
 #' @param opt_cl a list of vectors. Each vector stores the optimal clustering for one dataset.
+#' @param mc.cores number of cores used for parallel computing.
 #'
 #' @return a list of matrices, each is a gene-by-cell matrix of posterior mean of latent counts for a dataset.
 #' @export
 #'
 #' @examples
 #' latent_count(post_result = post_result, Y = list(t(y1), t(y2)), opt_cl = opt_cl)
-latent_count <- function(post_result, Y, opt_cl){
+latent_count <- function(post_result, Y, opt_cl, mc.cores=8){
 
   D <- length(Y)
   C <- sapply(Y, ncol)
@@ -117,7 +121,9 @@ latent_count <- function(post_result, Y, opt_cl){
   # latent Y
   Y_latent <- lapply(1:D, function(d) {
 
-    temp <- pbmclapply(1:L, function(i) {
+    print(paste('Compute for data',d))
+
+    temp <- pblapply(1:L, function(i) {
       matrix(as.vector(Y[[d]])*(as.vector(t(mu_sample[[i]][Z[[d]],]))+as.vector(t(phi_sample[[i]][Z[[d]],])))/
                (as.vector(t(mu_sample[[i]][Z[[d]],]))*rep(beta_sample[[i]][[d]],each=G)+as.vector(t(phi_sample[[i]][Z[[d]],]))) +
 
@@ -127,7 +133,7 @@ latent_count <- function(post_result, Y, opt_cl){
              nrow = G,
              ncol = C[d]
       )
-    },mc.cores = 4)
+    }, cl = mc.cores)
 
     return(Reduce('+', temp)/L)
   })
@@ -140,15 +146,15 @@ latent_count <- function(post_result, Y, opt_cl){
 #' @param Y a list of matrices. Each matrix is a gene-by-cell matrix of mRNA counts corresponding to a dataset.
 #' @param Y_latent a list of matrices, each is a gene-by-cell matrix of posterior mean of latent counts for a dataset.
 #' @param opt_cl a list of vectors. Each vector stores the optimal clustering for one dataset.
-#' @param data_names the labels for each dataset in the plot.
-#' @param color_pal a vector of color names to map to clusters.
+#' @param data_names optional. The labels for each dataset in the plot.
+#' @param color_pal optional. A vector of color names to map to clusters.
 #'
 #' @return two plots showing t-sne representation of the observed counts (first) and latent counts (second),
 #' where observations are colored by optimal clustering, and shaped by different datasets.
 #' @export
 #'
 #' @examples
-#' plot_tsne(Y = list(t(y1), t(y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c16)
+#' plot_tsne(Y = list(t(y1), t(y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c15)
 plot_tsne <- function(Y, Y_latent, opt_cl, data_names=NULL, color_pal=NULL){
 
   # combine datasets

@@ -16,7 +16,7 @@
 #' diagonal blocks correspond to within-dataset posterior similarity matrix.
 #' @export
 #'
-#' @examples plot_psm(psm.tot = psm, size = c(120, 120))
+#' @examples plot_psm(psm.tot = psm, size = C)
 plot_psm <- function(psm.tot,size){
   # size: the size of each dataset
   if(any(psm.tot !=t(psm.tot)) | any(psm.tot >1) | any(psm.tot < 0) | sum(diag(psm.tot)) != nrow(psm.tot) ){
@@ -27,7 +27,7 @@ plot_psm <- function(psm.tot,size){
   # total number of observations
   n_all <- sum(size)
 
-  # proportion of each dataset
+  # cumulative proportion of datasets
   n_cum <- cumsum(size)
 
   n_prop <- n_cum/n_all
@@ -47,7 +47,7 @@ plot_psm <- function(psm.tot,size){
                 angle_col = 90,fontsize = 8,color = my_palette,border_color=NA,silent=FALSE)
   grid::downViewport("matrix.4-3-4-3")
   for (i in n_prop[-length(n_prop)]) {
-    grid::grid.lines(x=c(0,1),y=i, gp=grid::gpar(col="black", lwd=2))
+    grid::grid.lines(x=c(0,1),y=1-i, gp=grid::gpar(col="black", lwd=2))
     grid::grid.lines(x=i,y=c(0,1), gp=grid::gpar(col="black", lwd=2))
   }
   grid::popViewport()

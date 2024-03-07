@@ -21,8 +21,8 @@ Depends:
 Imports:
     bayNorm,
     mvtnorm,
+    stats,
     extraDistr,
-    SciViews,
     Matrix,
     Rtsne,
     irlba,
@@ -36,8 +36,15 @@ Imports:
     mcclust.ext,
     mcclust,
     tidyr,
+    dplyr,
     ggplot2,
     gridExtra,
+    ggpubr,
     coda,
-    pbmcapply
-
+    pbapply,
+    graphics,
+    magrittr,
+    data.table,
+    RColorBrewer,
+    grid,
+    ggplotify
