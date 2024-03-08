@@ -146,6 +146,7 @@ local_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL, 
 #' Plot mean absolute log-fold change (LFC), and the number of local genes for each cluster.
 #'
 #' @param local_output output from \code{local_marker_genes}.
+#' @param nrow number of rows for displaying the plots of tail probabilities against mean absolute LFC
 #'
 #' @return the output contains four ggplot objects: 1. Tail probabilities against mean absolute LFC based on mean expression for each cluster,
 #' and the threshold to decide local DE genes. 2. A bar-chart showing the number of local DE genes for each cluster.
@@ -156,14 +157,14 @@ local_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL, 
 #' @examples
 #' ggs_local <- plot_local_marker_genes(local_output = local_result)
 #' gridExtra::grid.arrange(grobs=ggs_local,nrow=2)
-plot_local_marker_genes <- function(local_output){
+plot_local_marker_genes <- function(local_output, nrow=2){
 
   J <- max(local_output$mu.output$cluster)
   # ---- mean expression -----
   # plot tail probabilities against mean absolute LFC
   p1 <- ggplot(data=local_output$mu.output,aes(x=mean.lfc,y=tail.prob,col=DE))+
     geom_point(show.legend = F,size=0.5)+
-    facet_wrap(~cluster,nrow=2)+
+    facet_wrap(~cluster,nrow=nrow)+
     theme_bw()+
     scale_color_manual(values = c('Yes'='red','No'='grey'))+
     geom_hline(yintercept = local_output$alpha_m,linetype='dashed')+
@@ -181,7 +182,7 @@ plot_local_marker_genes <- function(local_output){
   # ---- dispersion -------
   p3 <- ggplot(data=local_output$phi.output,aes(x=mean.lfc,y=tail.prob,col=DD))+
     geom_point(show.legend = F,size=0.5)+
-    facet_wrap(~cluster,nrow=2)+
+    facet_wrap(~cluster,nrow=nrow)+
     theme_bw()+
     scale_color_manual(values = c('Yes'='red','No'='grey'))+
     geom_hline(yintercept = local_output$alpha_d,linetype='dashed')+

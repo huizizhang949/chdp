@@ -4,10 +4,12 @@
 \alias{plot_local_marker_genes}
 \title{Plot the results for local marker genes}
 \usage{
-plot_local_marker_genes(local_output)
+plot_local_marker_genes(local_output, nrow = 2)
 }
 \arguments{
 \item{local_output}{output from \code{local_marker_genes}.}
+
+\item{nrow}{number of rows for displaying the plots of tail probabilities against mean absolute LFC}
 }
 \value{
 the output contains four ggplot objects: 1. Tail probabilities against mean absolute LFC based on mean expression for each cluster,

@@ -151,7 +151,7 @@ local_result <- local_marker_genes(post_result = post_result, threshold = c(1.2,
 # 2. A bar-chart showing the number of local DE genes for each cluster.
 # 3. Tail probabilities against mean absolute LFC based on dispersion for each cluster, and the threshold to decide local DD genes.
 # 4. A bar-chart showing the number of local DD genes for each cluster.
-ggs_local <- plot_local_marker_genes(local_output = local_result)
+ggs_local <- plot_local_marker_genes(local_output = local_result, nrow = 1)
 # plot
 gridExtra::grid.arrange(grobs=ggs_local,nrow=2)
 
