@@ -254,6 +254,9 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 
 ```{r, echo=FALSE,out.width="40%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' ', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/DE_global.png","demo/figures/DD_global.png"))
+```
+
+```{r, echo=FALSE,out.width="40%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' ', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/DE_relative.png","demo/figures/DD_relative.png"))
 ```
 

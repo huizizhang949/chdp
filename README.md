@@ -260,7 +260,18 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/DE_global.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_global.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DE_relative.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_relative.png" alt=" " width="40%" height="20%" />
+<img src="demo/figures/DE_global.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_global.png" alt=" " width="40%" height="20%" />
+<p class="caption">
+</p>
+
+</div>
+
+</p>
+<p align="center">
+
+<div class="figure" style="text-align: center">
+
+<img src="demo/figures/DE_relative.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_relative.png" alt=" " width="40%" height="20%" />
 <p class="caption">
 </p>
 
