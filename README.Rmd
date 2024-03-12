@@ -5,10 +5,18 @@ output: github_document
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 ```{r, include = FALSE}
+library(htmltools)
 knitr::opts_chunk$set(
   comment = "#>",
   warning = FALSE, message = FALSE
 )
+knitr::knit_hooks$set(imgcenter = function(before, options, envir){
+  if (before) {
+    HTML("<p align='center'>")
+  } else {
+    HTML("</p>")
+  }
+})
 ```
 
 # chdp
@@ -27,7 +35,7 @@ You can install the development version of chdp from [GitHub](https://github.com
 devtools::install_github("huizizhang949/chdp")
 ```
 
-# Example - clustering single-cell data
+# Example 1 - clustering single-cell data
 
 First, prepare the datasets including the external covariate - latent time:
 
@@ -95,7 +103,7 @@ Choose a suitable value based on mean absolute difference (MAD) between PSMs
 plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/plot_consensus.png")
 ```
 After choosing suitable W and D, compute optimal clustering
@@ -358,7 +366,7 @@ ppp_mixed_cl_result <- ppp_mixed_cl(post_result = post_result, Y = list(t(Y1), t
 ppp_hist_cl(ppp_output = ppp_mixed_cl_result, nrow = 1, data_names = c('data 1', 'data 2'))
 ```
 
-# Example - clustering time-series data with VAR likelihood
+# Example 2 - clustering time-series data with VAR likelihood
 
 Prepare the datasets including the external covariate - time:
 

@@ -25,7 +25,7 @@ You can install the development version of chdp from
 devtools::install_github("huizizhang949/chdp")
 ```
 
-# Example - clustering single-cell data
+# Example 1 - clustering single-cell data
 
 First, prepare the datasets including the external covariate - latent
 time:
@@ -99,7 +99,10 @@ PSMs
 plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 ```
 
+<p align="center">
 <img src="demo/figures/plot_consensus.png" width="60%" style="display: block; margin: auto;" />
+</p>
+
 After choosing suitable W and D, compute optimal clustering
 
 ``` r
@@ -349,7 +352,7 @@ ppp_mixed_cl_result <- ppp_mixed_cl(post_result = post_result, Y = list(t(Y1), t
 ppp_hist_cl(ppp_output = ppp_mixed_cl_result, nrow = 1, data_names = c('data 1', 'data 2'))
 ```
 
-# Example - clustering time-series data with VAR likelihood
+# Example 2 - clustering time-series data with VAR likelihood
 
 Prepare the datasets including the external covariate - time:
 
