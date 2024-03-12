@@ -101,7 +101,7 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1,
         geom_point(size=size,alpha=alpha)+
         scale_colour_gradientn(colours = my_palette(n=400), limits=c(0, 1))+
         theme_bw()+
-        labs(title=paste0(data_names[d],': Cluster',j), x=xlab)
+        labs(title=paste0(data_names[d],': Cluster ',j), x=xlab)
     })
 
   })

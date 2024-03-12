@@ -6,7 +6,14 @@
 <!-- badges: start -->
 <!-- badges: end -->
 
-The goal of chdp is to …
+The chdp package is developed for implementing covariate-dependent
+hierarchical Dirichlet process, which allows for clustering across
+related datasets and incorporating the information of external
+covariate. The covariate can be flexibly included through different
+kernel functions. Two different applications are included in the
+package, one for single-cell clustering with a Gaussian kernel, and the
+other for clustering time-series data based on vector autoregression
+(VAR) with a periodic kernel.
 
 ## Installation
 
@@ -18,35 +25,77 @@ You can install the development version of chdp from
 devtools::install_github("huizizhang949/chdp")
 ```
 
-## Example
+# Example - clustering single-cell RNA-sequencing data
 
-This is a basic example which shows you how to solve a common problem:
-
-``` r
-# library(chdp)
-## basic example code
-```
-
-What is special about using `README.Rmd` instead of just `README.md`?
-You can include R chunks like so:
+First, prepare the datasets including the external covaraite - latent
+time:
 
 ``` r
-summary(cars)
-#>      speed           dist       
-#>  Min.   : 4.0   Min.   :  2.00  
-#>  1st Qu.:12.0   1st Qu.: 26.00  
-#>  Median :15.0   Median : 36.00  
-#>  Mean   :15.4   Mean   : 42.98  
-#>  3rd Qu.:19.0   3rd Qu.: 56.00  
-#>  Max.   :25.0   Max.   :120.00
+library(chdp)
+# G - dimension (number of genes)
+# C - number of data points in each dataset
+# J - number of clusters
+# Y - matrix: rows are observations
+# z - data allocation
+# t - covariate (latent time)
+# p_j - covariate-dependent time probabilities
+G=100; C=c(200,300); J=3
+# first dataset
+Y1 <- sim1.data[1:C[1],1:G]; z1 <- sim1.data[1:C[1],G+1]; 
+t1 <- sim1.data[1:C[1],G+2]; p_j1 <- sim1.data[1:C[1],-(1:(G+2))];
+# second dataset
+Y2 <- sim1.data[(C[1]+1):sum(C),1:G]; z2 <- sim1.data[(C[1]+1):sum(C),G+1]; 
+t2 <- sim1.data[(C[1]+1):sum(C),G+2]; p_j2 <- sim1.data[(C[1]+1):sum(C),-(1:(G+2))]
 ```
 
-You’ll still need to render `README.Rmd` regularly, to keep `README.md`
-up-to-date. `devtools::build_readme()` is handy for this.
+## Consensus clustering
 
-You can also embed plots, for example:
+To implement consensus clustering, first choose the width (number of
+chains) and depth (length of each chain). Below is an example of running
+consensus clustering, with 100 chains and 200 iterations on 8 cores
 
-<img src="man/figures/README-pressure-1.png" width="100%" />
+``` r
+Width <- 100
+Depth <- 200
+```
 
-In that case, don’t forget to commit and push the resulting figure
-files, so they display on GitHub and CRAN.
+``` r
+# for reproducibility
+set.seed(14663)
+seeds <- sample(1:1e8, Width)
+# parallel computing on 8 cores
+consensus_result <- pblapply(1:Width, function(i) {
+
+  set.seed(seeds[i])
+  b_inits <- runif(2,-5,5)
+  alpha_inits <- runif(1,0,10)
+  alpha_0_inits <- runif(1,0,10)
+
+  gkernelHDP_mcmc(Y = list(t(Y1), t(Y2)), t = list(t1, t2), J = 7, niter = Depth, burn_in = 0, thinning = 1,
+                 empirical = TRUE, empirical_z = TRUE,
+                 b_initial = b_inits, alpha_initial = alpha_inits, alpha_0_initial = alpha_0_inits,
+                 beta.mean = 0.6)
+}, cl=8)
+```
+
+Specify a range of condidate values (the first element is the baseline):
+
+``` r
+Ds <- c(1,seq(20,200,by=10))
+Ws <- c(1,seq(10,100,by=5))
+```
+
+Compute posterior similarity matrices (PSM) for different combination W
+and D
+
+``` r
+psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
+```
+
+Choose a suitable value based on mean absolute difference between PSMs
+
+``` r
+plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
+```
+
+<embed src="demo/figures/plot_consensus.pdf" width="0.3\linewidth" style="display: block; margin: auto;" type="application/pdf" />
