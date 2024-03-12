@@ -349,7 +349,7 @@ set.seed(3)
 ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = list(t(Y1), t(Y2)),
                                 opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 # plot the results from multiple replicates. compare density plots for each statistic between
-# replicated (red) and observed data (grey)
+# replicated (grey) and observed data (red)
 plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'data 2'))
 ```
 
@@ -448,7 +448,7 @@ And compare compare with the truth, if known
 
 ``` r
 # note that the cluster labels can be different while the partition is the same
-# and first observation in each dataset is not clusteres
+# and first observation in each dataset is not clustered
 table(c(z1[-1],z2[-1]), unlist(opt_cl))
 mclust::adjustedRandIndex(c(z1[-1],z2[-1]), unlist(opt_cl))
 ```

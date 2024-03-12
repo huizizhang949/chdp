@@ -266,9 +266,9 @@ plot_pred_c_prob <- function(pred_c_prob_output, t_obs, data, cluster, thinning=
 
   d=data;j=cluster
   if(is.null(thinning)){
-    inds <- seq(thinning, L, by=thinning)
-  }else{
     inds <- 1:L
+  }else{
+    inds <- seq(thinning, L, by=thinning)
   }
 
   plot(1,1,xlim=c(0,max(t_pred)),ylim=c(0,1),type='n',xlab='t',ylab='p(t)',main=paste0('Dataset ', d,': cluster ',j))

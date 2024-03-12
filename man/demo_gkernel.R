@@ -199,7 +199,7 @@ set.seed(3)
 ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = list(t(Y1), t(Y2)),
                                 opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 # plot the results from multiple replicates. compare density plots for each statistic between
-# replicated (red) and observed data (grey)
+# replicated (grey) and observed data (red)
 pdf('demo/figures/ppc_multiple_nb.pdf',w=12,h=6)
 plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'data 2'))
 dev.off()
