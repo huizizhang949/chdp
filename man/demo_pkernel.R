@@ -1,6 +1,6 @@
 # -------------- clustering with VAR likelihood and time as external covariate ------------
 # prepare the datasets, and time
-G=2; C=rep(150,2); J=2
+G=2; C=rep(151,2); J=3
 Y1 <- sim2.data[1:C[1],1:G]; z1 <- sim2.data[1:C[1],G+1]; t1 <- sim2.data[1:C[1],G+2]
 Y2 <- sim2.data[(C[1]+1):sum(C),1:G]; z2 <- sim2.data[(C[1]+1):sum(C),G+1]; t2 <- sim2.data[(C[1]+1):sum(C),G+2]
 p_j1 <- sim2.data[1:C[1],-(1:(G+2))]; p_j2 <- sim2.data[(C[1]+1):sum(C),-(1:(G+2))]
