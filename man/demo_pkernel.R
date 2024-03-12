@@ -51,7 +51,7 @@ pdf('demo/figures/cluster_size_var.pdf',w=10,h=6)
 cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 dev.off()
 
-# for each dataset, plot each feature against time and color observations by time
+# for each dataset, plot each feature against time and color observations by clusters
 pdf('demo/figures/plot_cluster_var.pdf',w=8,h=6)
 plot_var_cluster(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, color_pal = c25)
 dev.off()
