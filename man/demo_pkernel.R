@@ -102,8 +102,8 @@ pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = seq(1,2,by
 
 # plot posterior samples of time-dependent probabilities for future time points and observed time points,
 # for the specified dataset and cluster
-pdf('demo/figures/plot_pred_c_probpdf',w=6,h=6)
-plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
+pdf('demo/figures/plot_pred_c_prob.pdf',w=6,h=6)
+plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 2, cluster = 3, thinning = 5, color_pal = c25)
 dev.off()
 
 # ------ posterior predictive check --------
