@@ -126,7 +126,7 @@ plot_psm(psm.tot = opt$psm, size = C)
 ```
 
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=" ",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=" ",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/psm_all_nb.png","demo/figures/psm_single_nb.png"))
 ```
 
@@ -145,7 +145,7 @@ cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/cluster_size_nb.png")
 ```
 
@@ -174,7 +174,7 @@ plot_c_prob(post_result = post_result, opt_cl = opt_cl, t = list(t1, t2), mfrow 
 
 ```
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/plot_c_prob_nb1.png","demo/figures/plot_c_prob_nb2.png"))
 ```
 
@@ -187,7 +187,7 @@ PP_mean_result <- plot_pp(post_result = post_result, Y = list(t(Y1), t(Y2)), t =
 ```
 
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/plot_pp_mean_nb1.png","demo/figures/plot_pp_mean_nb2.png"))
 ```
 
@@ -200,7 +200,7 @@ mean_latent_counts <- plot_mean_latent_count(post_result = post_result, t = list
                        prob = 0.99, xlab='t')
 ```
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/mean_latent_count_nb1.png","demo/figures/mean_latent_count_nb2.png"))
 ```
 
@@ -212,7 +212,7 @@ Y_latent <- latent_count(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_
 
 Visualize observed and latent counts on 2D using t-sne
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/tsne_nb.png")
 ```
 
@@ -234,7 +234,7 @@ Get a summary of global marker genes
 plot_global_marker_genes(global_output = global_result)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/global_nb.png")
 ```
 
@@ -248,7 +248,7 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 ```
 
 
-```{r, echo=FALSE,out.width="40%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' '}
+```{r, echo=FALSE,out.width="40%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' ', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/DE_global.png","demo/figures/DD_global.png"))
 knitr::include_graphics(c("demo/figures/DE_relative.png","demo/figures/DD_relative.png"))
 ```
@@ -261,7 +261,7 @@ observed_counts_heatmap(Y = list(t(Y1),t(Y2)), opt_cl = opt_cl, global_output = 
 ```
 
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/obs_heatmap.png")
 ```
 
@@ -271,7 +271,7 @@ And do the same for estimated latent counts
 latent_counts_heatmap(Y_latent = Y_latent, opt_cl = opt_cl, global_output = global_result)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/latent_heatmap.png")
 ```
 
@@ -323,7 +323,7 @@ set.seed(2)
 plot_ppc_single(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/ppc_single_nb1.png","demo/figures/ppc_single_nb2.png"))
 ```
 
@@ -339,7 +339,7 @@ ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = list(t(Y1), t(Y2)
 plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'data 2'))
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/ppc_multiple_nb1.png","demo/figures/ppc_multiple_nb2.png"))
 ```
 
@@ -417,7 +417,7 @@ mcclust.ext::plotpsm(psm = opt$psm)
 plot_psm(psm.tot = opt$psm, size = C)
 ```
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=" ",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.cap=" ",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/psm_all_var.png","demo/figures/psm_single_var.png"))
 ```
 
@@ -437,7 +437,7 @@ cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/cluster_size_var.png")
 ```
 
@@ -447,7 +447,7 @@ Specifically, for time-series data, we visualize the cluster by plotting each fe
 plot_var_cluster(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, color_pal = c25)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/plot_cluster_var.png")
 ```
 
@@ -478,7 +478,7 @@ plot_c_prob(post_result = post_result, opt_cl = opt_cl, t = list(t1[-1], t2[-1])
 
 ```
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center'}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/plot_c_prob_var1.png","demo/figures/plot_c_prob_var2.png"))
 ```
 
@@ -496,7 +496,7 @@ conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl
 plot_conditional_mean(conditional_mean_output = conditional_mean_result, data = 1, cluster = 1)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/plot_conditional_mean.png")
 ```
 
@@ -518,7 +518,7 @@ plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = li
 ```
 
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' '}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' ', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/plot_pred_trend1.png","demo/figures/plot_pred_trend2.png"))
 ```
 
@@ -533,7 +533,7 @@ pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = seq(1,2,by
 plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
 ```
 
-```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "60%"}
+```{r, include=TRUE, fig.align="center", echo=FALSE, out.width = "40%", imgcenter=TRUE}
 knitr::include_graphics("demo/figures/plot_pred_c_prob.png")
 ```
 
@@ -552,7 +552,7 @@ ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,
 plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 ```
 
-```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' '}
+```{r, echo=FALSE,out.width="49%", out.height="20%",fig.show='hold',fig.align='center',fig.cap=' ', imgcenter=TRUE}
 knitr::include_graphics(c("demo/figures/plot_ppc_var1.png","demo/figures/plot_ppc_var2.png"))
 ```
 
