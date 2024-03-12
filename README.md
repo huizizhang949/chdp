@@ -114,7 +114,7 @@ opt_cl <- opt$opt_cl
 opt$psm
 ```
 
-To understand the uncertainty in data partition,
+To understand the uncertainty in data partition
 
 ``` r
 # plot psm
@@ -357,8 +357,8 @@ plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'd
 <img src="demo/figures/ppc_multiple_nb1.png" width="60%" style="display: block; margin: auto;" /><img src="demo/figures/ppc_multiple_nb2.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
-Finally, posterior predictive p-values are also possible to compute from
-the following functions
+Finally, posterior predictive p-values are also available from the
+following functions
 
 ``` r
 # ----- posterior predictive p-values ----------
@@ -480,7 +480,7 @@ For inference of the other parameters, fix the optimal clustering and
 run a post-processing step
 
 ``` r
-# post-processing: fix Z to the optimal one from consensus clustering
+# post-processing: fix Z to the optimal one from the above step
 set.seed(666)
 post_result <- pkernelHDP_mcmc(Y=list(Y1,Y2), t=list(t1,t2), niter=16000, burn_in = 12000, thinning = 2,
                               Z_fix = opt_cl, target_accept=0.234, mu_h = -2)
@@ -570,7 +570,7 @@ plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, 
 ## Posterior predictive check
 
 For multiple replicated datasets, we compare the mean and credible
-intervals of the replicats with the observed data
+intervals of the replicates with the observed data
 
 ``` r
 # generate multiple replicated datasets for posterior predictive check, and computes
