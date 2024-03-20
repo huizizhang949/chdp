@@ -219,9 +219,10 @@ set.seed(5)
 ppp_mixed_cl_result <- ppp_mixed_cl(post_result = post_result, Y = list(t(Y1), t(Y2)),
                                   opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 
+# pdf(file='~/Library/CloudStorage/OneDrive-UniversityofEdinburgh/Mac/Project/code/rpkg/ppp_cl_dropout.pdf',w=12,h=6)
 # plot histograms for each discrepancy measure, for each cluster and each dataset
 ppp_hist_cl(ppp_output = ppp_mixed_cl_result, nrow = 1, data_names = c('data 1', 'data 2'))
-
+# dev.off()
 
 
 

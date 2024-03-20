@@ -9,7 +9,7 @@
 The chdp package is developed for implementing covariate-dependent
 hierarchical Dirichlet process, which allows for clustering across
 related datasets and incorporating the information of external
-covariate. The covariate can be flexibly included through different
+covariates. The covariate can be flexibly included through different
 kernel functions. Two different applications are included in the
 package, one for single-cell clustering with a Gaussian kernel, and the
 other for clustering time-series data based on vector autoregression
@@ -85,8 +85,8 @@ Ds <- c(1,seq(20,200,by=10))
 Ws <- c(1,seq(10,100,by=5))
 ```
 
-Compute posterior similarity matrices (PSM) for different combination W
-and D
+Compute posterior similarity matrices (PSM) for different combinations
+of W and D
 
 ``` r
 psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
@@ -136,7 +136,7 @@ plot_psm(psm.tot = opt$psm, size = C)
 
 </p>
 
-And compare compare with the truth, if known
+And compare the results with the truth, if known
 
 ``` r
 # note that the cluster labels can be different while the partition is the same
@@ -402,7 +402,7 @@ rm(list=ls())
 # J - number of clusters
 # Y - matrix: rows are observations
 # z - data allocation
-# t - covariate (latent time)
+# t - covariate (time)
 # p_j - covariate-dependent time probabilities
 G=2; C=rep(151,2); J=3
 # first dataset
@@ -455,7 +455,7 @@ plot_psm(psm.tot = opt$psm, size = C)
 
 </p>
 
-And compare compare with the truth, if known
+And compare the results with the truth, if known
 
 ``` r
 # note that the cluster labels can be different while the partition is the same
