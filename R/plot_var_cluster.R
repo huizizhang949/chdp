@@ -26,7 +26,7 @@ plot_var_cluster <- function(Y, t, opt_cl, data_names=NULL, color_pal=NULL, nrow
   # for each dataset, save the data, t, optimal cluster, dataset indicator
   Y_df <- lapply(1:D, function(d) {
 
-    df_d <- data.frame(Y[[d]][-1,]); df_d$cluster <- as.factor(opt_cl[[d]]); df_d$t <- t[[d]][-1]
+    df_d <- data.frame(Y[[d]][-1,]); df_d$cluster <- opt_cl[[d]]; df_d$t <- t[[d]][-1]
     colnames(df_d)[1:G] <- paste0('y',1:G)
     df_d$dataset <- data_names[d]
 
@@ -34,6 +34,8 @@ plot_var_cluster <- function(Y, t, opt_cl, data_names=NULL, color_pal=NULL, nrow
   })
 
   Y_df <- do.call(rbind,Y_df)
+  Y_df$cluster <- as.factor(Y_df$cluster)
+  J <- length(unique(Y_df$cluster))
 
   # turn into a long format
   Y_df_long <- reshape2::melt(Y_df, id.vars = c('t','cluster','dataset'), variable.name = "y")
@@ -42,16 +44,17 @@ plot_var_cluster <- function(Y, t, opt_cl, data_names=NULL, color_pal=NULL, nrow
     geom_line(aes(x=t,y=value),col='grey',linetype=1,linewidth=0.3)+
     geom_point(aes(x=t,y=value,shape=cluster,col=cluster),size=0.6)+
     # scale_color_manual(values=color_pal)+
-    # scale_shape_manual(values=seq(1,23))+
+    scale_shape_manual(values=seq(1,J))+
     theme_bw()+
     labs(color='cluster',shape='cluster',y='')+
     theme(legend.position = 'bottom')+
-    guides(color = guide_legend(nrow = nrow_legend))+
     facet_grid(y ~ dataset)
 
   if(!is.null(color_pal)){
     gg <- gg+scale_color_manual(values=color_pal)
   }
+
+  gg <- gg+guides(color = guide_legend(nrow = nrow_legend), shape = guide_legend(nrow = nrow_legend))
 
   print(gg)
 }
