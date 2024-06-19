@@ -7,11 +7,11 @@
 plot_conditional_mean(conditional_mean_output, data, cluster)
 }
 \arguments{
+\item{conditional_mean_output}{output from \code{conditional_mean}.}
+
 \item{data}{numeric value to indicate which dataset to visualize.}
 
 \item{cluster}{numeric value to indicate which cluster to visualize.}
-
-\item{conditional_mean_ouput}{output from \code{conditional_mean}.}
 }
 \value{
 plots showing the posterior means (red) and credible intervals (black bar) against time, with

@@ -20,8 +20,8 @@
 #' @export
 #'
 #' @examples
-#' local_result <- local_marker_genes(post_result = post_result, threshold = c(1.2,1.2),
-#'                                    alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
+#' local_result <- local_marker_genes(post_result = post_result,
+#'   threshold = c(1.2,1.2), alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
 local_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL, alpha_d=NULL,
                                mc.cores=8){
 

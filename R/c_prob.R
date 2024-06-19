@@ -16,6 +16,7 @@
 #' @param truth optional. A list of matrices. Each matrix stores the true covariate-dependent probabilities for one dataset,
 #' where rows correspond to observations and columns correspond to clusters.
 #' @param plot.empty.cluster if \code{FALSE}, only plot for occupied clusters.
+#' @param color_pal optional. A vector of color names to map to clusters.
 #'
 #' @return plots showing MCMC samples of covariate-dependent probabilities for every cluster in each dataset.
 #' @export

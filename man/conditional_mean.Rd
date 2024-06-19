@@ -36,6 +36,6 @@ a list of three components:
 This function calculates the mean conditional on the past observation as well as credible intervals
 }
 \examples{
-conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, post_result = post_result,
-                                            prob = c(0.005,0.995), mc.cores = 2)
+conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl,
+    post_result = post_result, prob = c(0.005,0.995), mc.cores = 2)
 }

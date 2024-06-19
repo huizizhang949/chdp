@@ -35,6 +35,8 @@ plot_c_prob(
 \item{truth}{optional. A list of matrices. Each matrix stores the true covariate-dependent probabilities for one dataset,
 where rows correspond to observations and columns correspond to clusters.}
 
+\item{color_pal}{optional. A vector of color names to map to clusters.}
+
 \item{plot.empty.cluster}{if \code{FALSE}, only plot for occupied clusters.}
 }
 \value{

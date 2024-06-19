@@ -7,11 +7,11 @@
 plot_pred_trend(pred_trend_output, Y, t_obs)
 }
 \arguments{
+\item{pred_trend_output}{output from \code{pred_trend}.}
+
 \item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
 
 \item{t_obs}{a list of two vectors. Each vector contains the time for individual observed dataset.}
-
-\item{pred_trend_result}{output from \code{pred_trend}.}
 }
 \value{
 plots for each dataset, showing posterior predictive means in red solid lines, credible intervals in red area,

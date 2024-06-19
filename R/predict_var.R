@@ -119,7 +119,7 @@ pred_trend <- function(post_result, Y, t_pred, prob=c(0.005,0.995), mc.cores=8){
 #' @description
 #' This function plots future trends and associated credible intervals.
 #'
-#' @param pred_trend_result output from \code{pred_trend}.
+#' @param pred_trend_output output from \code{pred_trend}.
 #' @param Y a list of two matrices for two datasets. The columns correspond to features.
 #' @param t_obs a list of two vectors. Each vector contains the time for individual observed dataset.
 #'
@@ -244,7 +244,7 @@ pred_c_prob <- function(post_result, t_pred, mc.cores=8){
 #' This function plots posterior samples of time-dependent probabilities for future time points
 #' and observed time points in the data.
 #'
-#' @param pred_c_prob_result ouput from \code{pred_c_prob}.
+#' @param pred_c_prob_output ouput from \code{pred_c_prob}.
 #' @param t_obs a list of two vectors. Each vector contains the time for individual observed dataset.
 #' @param data numeric value to indicate which dataset to visualize.
 #' @param cluster numeric value to indicate which cluster to visualize.
@@ -256,7 +256,8 @@ pred_c_prob <- function(post_result, t_pred, mc.cores=8){
 #' @export
 #'
 #' @examples
-#' plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
+#' plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1,
+#'   data = 1, cluster = 1, thinning = 5, color_pal = c25)
 plot_pred_c_prob <- function(pred_c_prob_output, t_obs, data, cluster, thinning=NULL, color_pal=NULL){
 
   pt_predict <- pred_c_prob_output$pt_predict

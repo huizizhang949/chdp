@@ -4,6 +4,7 @@
 #' Identify globally differentially expressed and dispersed genes。
 #'
 #' @importFrom pbapply pblapply
+#' @importFrom utils combn
 #' @param post_result output from \code{gkernelHDP_mcmc} for the post-processing step.
 #' @param threshold a vector of length 2, corresponding to the threshold in the calculation of tail probabilities.
 #' @param alpha_m optional. The threshold to classify globally differentially expressed (DE) genes. If not provided, the value will be

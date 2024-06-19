@@ -36,6 +36,6 @@ The output contains the following items:
 Identify locally differentially expressed and dispersed genes.
 }
 \examples{
-local_result <- local_marker_genes(post_result = post_result, threshold = c(1.2,1.2),
-                                   alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
+local_result <- local_marker_genes(post_result = post_result,
+  threshold = c(1.2,1.2), alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
 }

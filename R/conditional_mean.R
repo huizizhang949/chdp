@@ -3,6 +3,7 @@
 #' @description
 #' This function calculates the mean conditional on the past observation as well as credible intervals
 #'
+#' @importFrom stats quantile
 #' @param Y a list of two matrices for two datasets. The columns correspond to features.
 #' @param t a list of two vectors. Each vector is the external covariate (time) for individual dataset.
 #' @param opt_cl a list of vectors. Each vector stores the optimal clustering for one dataset.
@@ -17,8 +18,8 @@
 #' @export
 #'
 #' @examples
-#' conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, post_result = post_result,
-#'                                             prob = c(0.005,0.995), mc.cores = 2)
+#' conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl,
+#'     post_result = post_result, prob = c(0.005,0.995), mc.cores = 2)
 
 conditional_mean <- function(Y, t, opt_cl, post_result, prob=c(0.005,0.995), mc.cores=8){
 
@@ -87,7 +88,7 @@ conditional_mean <- function(Y, t, opt_cl, post_result, prob=c(0.005,0.995), mc.
 #' @description
 #' This function plots the posterior mean and credible intervals for the conditional mean.
 #'
-#' @param conditional_mean_ouput output from \code{conditional_mean}.
+#' @param conditional_mean_output output from \code{conditional_mean}.
 #' @param data numeric value to indicate which dataset to visualize.
 #' @param cluster numeric value to indicate which cluster to visualize.
 #'
