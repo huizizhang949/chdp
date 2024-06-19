@@ -22,7 +22,7 @@ save(test1,file='man/test1.RData')
 # compute optimal clustering, here the argument pkernel_output should contain a list
 # of outputs from pkernelHDP_mcmc.
 opt <- opt_cl_var(pkernel_output = list(test1))
-# save(opt,file='man/opt_var.RData')
+save(opt,file='man/opt_var.RData')
 
 # optimal clustering
 opt_cl <- opt$opt_cl
