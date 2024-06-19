@@ -36,6 +36,6 @@ The output contains the following items:
 Identify globally differentially expressed and dispersed genes。
 }
 \examples{
-global_result <- global_marker_genes(post_result = post_result, threshold = c(2.5,2.5),
-                                     alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
+global_result <- global_marker_genes(post_result = post_result,
+  threshold = c(2.5,2.5), alpha_m = 0.3, alpha_d = 0.3, mc.cores = 2)
 }

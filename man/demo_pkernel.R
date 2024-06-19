@@ -32,13 +32,13 @@ opt$psm
 # plot psm
 # without distinguishing datasets
 
-pdf('demo/figures/psm_all_var.pdf',w=6,h=6)
+pdf('demo_figures/psm_all_var.pdf',w=6,h=6)
 mcclust.ext::plotpsm(psm = opt$psm)
 dev.off()
 
 # distinguish datasets, note that the first observation in each dataset is not clustered
 
-pdf('demo/figures/psm_single_var.pdf',w=6,h=6)
+pdf('demo_figures/psm_single_var.pdf',w=6,h=6)
 plot_psm(psm.tot = opt$psm, size = C)
 dev.off()
 
@@ -48,12 +48,12 @@ table(c(z1[-1],z2[-1]), unlist(opt_cl))
 mclust::adjustedRandIndex(c(z1[-1],z2[-1]), unlist(opt_cl))
 
 # summary of cluster sizes
-pdf('demo/figures/cluster_size_var.pdf',w=10,h=6)
+pdf('demo_figures/cluster_size_var.pdf',w=10,h=6)
 cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 dev.off()
 
 # for each dataset, plot each feature against time and color observations by clusters
-pdf('demo/figures/plot_cluster_var.pdf',w=8,h=6)
+pdf('demo_figures/plot_cluster_var.pdf',w=8,h=6)
 plot_var_cluster(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, color_pal = c25)
 dev.off()
 # ----------- for inference of the other parameters, fix the optimal clustering and run a post-processing step ---------
@@ -83,7 +83,7 @@ conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl
                                             prob = c(0.005,0.995), mc.cores = 2)
 
 # plots the posterior mean and credible intervals for the conditional mean
-pdf('demo/figures/plot_conditional_mean.pdf',w=8,h=6)
+pdf('demo_figures/plot_conditional_mean.pdf',w=8,h=6)
 plot_conditional_mean(conditional_mean_output = conditional_mean_result, data = 1, cluster = 1)
 dev.off()
 
@@ -104,7 +104,7 @@ pred_c_prob_result <- pred_c_prob(post_result = post_result, t_pred = seq(1,2,by
 
 # plot posterior samples of time-dependent probabilities for future time points and observed time points,
 # for the specified dataset and cluster
-pdf('demo/figures/plot_pred_c_prob.pdf',w=6,h=6)
+pdf('demo_figures/plot_pred_c_prob.pdf',w=6,h=6)
 plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, cluster = 1, thinning = 5, color_pal = c25)
 dev.off()
 

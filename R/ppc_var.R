@@ -60,7 +60,7 @@ ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=c(0.005,0.995), 
 
       mu <- matrix(X[cc,]%*%L.s[[Z[cc]]],nrow=1)
 
-      y <- mvnfast::rmvn(1, mu=mu, sigma = Sigma.s[[Z[cc]]])
+      y <- mvtnorm::rmvnorm(1, mean=mu, sigma = Sigma.s[[Z[cc]]])
 
       return(y)
 

@@ -39,7 +39,7 @@ Ws <- c(1,seq(10,100,by=5))
 # a list of posterior similarity matrices for different combination W and D
 psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
 # plot mean absolute difference to determine suitable width and depth
-pdf(file='demo/figures/plot_consensus.pdf',w=10,h=8)
+pdf(file='demo_figures/plot_consensus.pdf',w=10,h=8)
 plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 dev.off()
 
@@ -55,11 +55,11 @@ opt$psm
 
 # plot psm
 # without distinguishing datasets
-pdf('demo/figures/psm_all_nb.pdf',w=6,h=6)
+pdf('demo_figures/psm_all_nb.pdf',w=6,h=6)
 mcclust.ext::plotpsm(psm = opt$psm)
 dev.off()
 # distinguish datasets
-pdf('demo/figures/psm_single_nb.pdf',w=6,h=6)
+pdf('demo_figures/psm_single_nb.pdf',w=6,h=6)
 plot_psm(psm.tot = opt$psm, size = C)
 dev.off()
 
@@ -69,7 +69,7 @@ table(c(z1,z2), unlist(opt_cl))
 mclust::adjustedRandIndex(c(z1,z2), unlist(opt_cl))
 
 # summary of cluster sizes
-pdf('demo/figures/cluster_size_nb.pdf',w=10,h=6)
+pdf('demo_figures/cluster_size_nb.pdf',w=10,h=6)
 cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 dev.off()
 # ----------- for inference of the other parameters, fix the optimal clustering and run a post-processing step ---------
@@ -124,7 +124,7 @@ lines(t1[order(t1)], mean_latent_counts[[d]][order(t1),g,3],col='red',lty=2)
 Y_latent <- latent_count(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_cl, mc.cores = 2)
 
 # visualize observed and latent counts on 2D using t-sne
-pdf('demo/figures/tsne_nb.pdf',w=10,h=6)
+pdf('demo_figures/tsne_nb.pdf',w=10,h=6)
 set.seed(1)
 plot_tsne(Y = list(t(Y1), t(Y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c15)
 dev.off()
@@ -136,7 +136,7 @@ global_result <- global_marker_genes(post_result = post_result, threshold = c(2.
 
 # plot tail probabilities against mean absolute log-fold change (LFC) for all genes, in terms of
 # mean expression and dispersion parameter. Also summarize the overlaps between global DE and DD genes
-pdf('demo/figures/global_nb.pdf',w=12,h=6)
+pdf('demo_figures/global_nb.pdf',w=12,h=6)
 plot_global_marker_genes(global_output = global_result)
 dev.off()
 # show four heatmaps for estimated mean and dispersion parameters
@@ -151,12 +151,12 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 # plot heatmaps of observed counts, with genes ordered by decreasing tail probabilities (DE) from top to bottom,
 # a red dashed line separates global and non-globle DE genes. Cells are separated
 # by clusters (yellow vertical solid line) and also separated by datasets within each cluster (yellow vertical dashed line)
-pdf('demo/figures/obs_heatmap.pdf',w=12,h=6)
+pdf('demo_figures/obs_heatmap.pdf',w=12,h=6)
 observed_counts_heatmap(Y = list(t(Y1),t(Y2)), opt_cl = opt_cl, global_output = global_result)
 dev.off()
 
 # heatmap for estimated latent counts, in the same fashion as observed counts
-pdf('demo/figures/latent_heatmap.pdf',w=12,h=6)
+pdf('demo_figures/latent_heatmap.pdf',w=12,h=6)
 latent_counts_heatmap(Y_latent = Y_latent, opt_cl = opt_cl, global_output = global_result)
 dev.off()
 # ---- locally differentially expressed (DE) and dispersed (DD) marker genes ------
@@ -189,7 +189,7 @@ gridExtra::grid.arrange(grobs=heatmaps_ggs_local$phi.ggs,nrow=1)
 # ----- a single replicate --------------------
 # generate a single replicate, compare the relationship between statistics between replicate and observed data
 # compare differences in statistics between replicate and observed data
-pdf('demo/figures/ppc_single_nb.pdf',w=12,h=6)
+pdf('demo_figures/ppc_single_nb.pdf',w=12,h=6)
 set.seed(2)
 plot_ppc_single(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 dev.off()
@@ -200,7 +200,7 @@ ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = list(t(Y1), t(Y2)
                                 opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 # plot the results from multiple replicates. compare density plots for each statistic between
 # replicated (grey) and observed data (red)
-pdf('demo/figures/ppc_multiple_nb.pdf',w=12,h=6)
+pdf('demo_figures/ppc_multiple_nb.pdf',w=12,h=6)
 plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'data 2'))
 dev.off()
 

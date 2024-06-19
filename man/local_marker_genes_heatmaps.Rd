@@ -22,7 +22,8 @@ for local DD genes of the cluster. Genes are ordered by decreasing tail probabil
 The function shows the heatmaps for estimated mean and dispersion parameters of local marker genes, for each cluster.
 }
 \examples{
-heatmaps_ggs_local <- local_marker_genes_heatmaps(local_output = local_result, post_result = post_result)
+heatmaps_ggs_local <- local_marker_genes_heatmaps(local_output = local_result,
+  post_result = post_result)
 gridExtra::grid.arrange(grobs=heatmaps_ggs_local$mu.ggs,nrow=1)
 gridExtra::grid.arrange(grobs=heatmaps_ggs_local$phi.ggs,nrow=1)
 }

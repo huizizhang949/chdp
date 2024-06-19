@@ -222,7 +222,8 @@ plot_local_marker_genes <- function(local_output, nrow=2){
 #' @export
 #'
 #' @examples
-#' heatmaps_ggs_local <- local_marker_genes_heatmaps(local_output = local_result, post_result = post_result)
+#' heatmaps_ggs_local <- local_marker_genes_heatmaps(local_output = local_result,
+#'   post_result = post_result)
 #' gridExtra::grid.arrange(grobs=heatmaps_ggs_local$mu.ggs,nrow=1)
 #' gridExtra::grid.arrange(grobs=heatmaps_ggs_local$phi.ggs,nrow=1)
 local_marker_genes_heatmaps <- function(local_output, post_result){

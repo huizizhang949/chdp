@@ -17,7 +17,7 @@ Encoding: UTF-8
 RoxygenNote: 7.3.1
 LazyData: true
 Depends:
-    R (>= 2.10)
+    R (>= 3.50)
 Imports:
     bayNorm,
     mvtnorm,
@@ -30,10 +30,10 @@ Imports:
     truncnorm,
     MCMCpack,
     mniw,
-    mclust,
     pheatmap,
     mcclust.ext,
     mcclust,
+    mclust,
     tidyr,
     dplyr,
     ggplot2,
@@ -49,3 +49,4 @@ Imports:
     ggplotify,
     reshape2,
     ggh4x
+

@@ -100,7 +100,7 @@ plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 ```
 
 <p align="center">
-<img src="demo/figures/plot_consensus.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_consensus.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 After choosing suitable W and D, compute optimal clustering
@@ -128,7 +128,7 @@ plot_psm(psm.tot = opt$psm, size = C)
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/psm_all_nb.png" alt=" " width="49%" height="20%" /><img src="demo/figures/psm_single_nb.png" alt=" " width="49%" height="20%" />
+<img src="demo_figures/psm_all_nb.png" alt=" " width="49%" height="20%" /><img src="demo_figures/psm_single_nb.png" alt=" " width="49%" height="20%" />
 <p class="caption">
 </p>
 
@@ -151,7 +151,7 @@ cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
 <p align="center">
-<img src="demo/figures/cluster_size_nb.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/cluster_size_nb.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 ## Post-processing
@@ -180,7 +180,7 @@ plot_c_prob(post_result = post_result, opt_cl = opt_cl, t = list(t1, t2), mfrow 
 ```
 
 <p align="center">
-<img src="demo/figures/plot_c_prob_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo/figures/plot_c_prob_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_c_prob_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo_figures/plot_c_prob_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
 </p>
 
 Below we compute posterior mean of the probability (PP) of belonging to
@@ -194,7 +194,7 @@ PP_mean_result <- plot_pp(post_result = post_result, Y = list(t(Y1), t(Y2)), t =
 ```
 
 <p align="center">
-<img src="demo/figures/plot_pp_mean_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo/figures/plot_pp_mean_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_pp_mean_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo_figures/plot_pp_mean_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
 </p>
 
 And further we can compute posterior mean and highest posterior density
@@ -208,7 +208,7 @@ mean_latent_counts <- plot_mean_latent_count(post_result = post_result, t = list
 ```
 
 <p align="center">
-<img src="demo/figures/mean_latent_count_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo/figures/mean_latent_count_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
+<img src="demo_figures/mean_latent_count_nb1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo_figures/mean_latent_count_nb2.png" width="49%" height="20%" style="display: block; margin: auto;" />
 </p>
 
 Compute posterior mean of the latent count, conditional on allocations
@@ -220,7 +220,7 @@ Y_latent <- latent_count(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_
 Visualize observed and latent counts on 2D using t-sne
 
 <p align="center">
-<img src="demo/figures/tsne_nb.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/tsne_nb.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 ### Marker genes
@@ -242,7 +242,7 @@ plot_global_marker_genes(global_output = global_result)
 ```
 
 <p align="center">
-<img src="demo/figures/global_nb.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/global_nb.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 Below shows four heatmaps for estimated (log) mean and dispersion
@@ -260,7 +260,7 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/DE_global.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_global.png" alt=" " width="40%" height="20%" />
+<img src="demo_figures/DE_global.png" alt=" " width="40%" height="20%" /><img src="demo_figures/DD_global.png" alt=" " width="40%" height="20%" />
 <p class="caption">
 </p>
 
@@ -271,7 +271,7 @@ global_marker_genes_heatmaps(global_output = global_result, post_result = post_r
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/DE_relative.png" alt=" " width="40%" height="20%" /><img src="demo/figures/DD_relative.png" alt=" " width="40%" height="20%" />
+<img src="demo_figures/DE_relative.png" alt=" " width="40%" height="20%" /><img src="demo_figures/DD_relative.png" alt=" " width="40%" height="20%" />
 <p class="caption">
 </p>
 
@@ -289,7 +289,7 @@ observed_counts_heatmap(Y = list(t(Y1),t(Y2)), opt_cl = opt_cl, global_output = 
 ```
 
 <p align="center">
-<img src="demo/figures/obs_heatmap.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/obs_heatmap.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 And do the same for estimated latent counts
@@ -299,7 +299,7 @@ latent_counts_heatmap(Y_latent = Y_latent, opt_cl = opt_cl, global_output = glob
 ```
 
 <p align="center">
-<img src="demo/figures/latent_heatmap.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/latent_heatmap.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 As for local marker genes,
@@ -350,7 +350,7 @@ plot_ppc_single(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_
 ```
 
 <p align="center">
-<img src="demo/figures/ppc_single_nb1.png" width="60%" style="display: block; margin: auto;" /><img src="demo/figures/ppc_single_nb2.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/ppc_single_nb1.png" width="60%" style="display: block; margin: auto;" /><img src="demo_figures/ppc_single_nb2.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 ``` r
@@ -365,7 +365,7 @@ plot_ppc_multiple(ppc_multiple_df = ppc_multiple_df, data_names = c('data 1', 'd
 ```
 
 <p align="center">
-<img src="demo/figures/ppc_multiple_nb1.png" width="60%" style="display: block; margin: auto;" /><img src="demo/figures/ppc_multiple_nb2.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/ppc_multiple_nb1.png" width="60%" style="display: block; margin: auto;" /><img src="demo_figures/ppc_multiple_nb2.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 Finally, posterior predictive p-values are also available from the
@@ -447,7 +447,7 @@ plot_psm(psm.tot = opt$psm, size = C)
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/psm_all_var.png" alt=" " width="49%" height="20%" /><img src="demo/figures/psm_single_var.png" alt=" " width="49%" height="20%" />
+<img src="demo_figures/psm_all_var.png" alt=" " width="49%" height="20%" /><img src="demo_figures/psm_single_var.png" alt=" " width="49%" height="20%" />
 <p class="caption">
 </p>
 
@@ -471,7 +471,7 @@ cluster_size(opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
 <p align="center">
-<img src="demo/figures/cluster_size_var.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/cluster_size_var.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 Specifically, for time-series data, we visualize the cluster by plotting
@@ -482,7 +482,7 @@ plot_var_cluster(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, color_pal = c25)
 ```
 
 <p align="center">
-<img src="demo/figures/plot_cluster_var.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_cluster_var.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 ## Post-processing
@@ -513,7 +513,7 @@ plot_c_prob(post_result = post_result, opt_cl = opt_cl, t = list(t1[-1], t2[-1])
 ```
 
 <p align="center">
-<img src="demo/figures/plot_c_prob_var1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo/figures/plot_c_prob_var2.png" width="49%" height="20%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_c_prob_var1.png" width="49%" height="20%" style="display: block; margin: auto;" /><img src="demo_figures/plot_c_prob_var2.png" width="49%" height="20%" style="display: block; margin: auto;" />
 </p>
 
 ### Conditional mean
@@ -532,7 +532,7 @@ plot_conditional_mean(conditional_mean_output = conditional_mean_result, data = 
 ```
 
 <p align="center">
-<img src="demo/figures/plot_conditional_mean.png" width="60%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_conditional_mean.png" width="60%" style="display: block; margin: auto;" />
 </p>
 
 ### Prediction
@@ -555,7 +555,7 @@ plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = li
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/plot_pred_trend1.png" alt=" " width="49%" height="20%" /><img src="demo/figures/plot_pred_trend2.png" alt=" " width="49%" height="20%" />
+<img src="demo_figures/plot_pred_trend1.png" alt=" " width="49%" height="20%" /><img src="demo_figures/plot_pred_trend2.png" alt=" " width="49%" height="20%" />
 <p class="caption">
 </p>
 
@@ -575,7 +575,7 @@ plot_pred_c_prob(pred_c_prob_output = pred_c_prob_result, t_obs = t1, data = 1, 
 ```
 
 <p align="center">
-<img src="demo/figures/plot_pred_c_prob.png" width="40%" style="display: block; margin: auto;" />
+<img src="demo_figures/plot_pred_c_prob.png" width="40%" style="display: block; margin: auto;" />
 </p>
 
 ## Posterior predictive check
@@ -598,7 +598,7 @@ plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 
 <div class="figure" style="text-align: center">
 
-<img src="demo/figures/plot_ppc_var1.png" alt=" " width="49%" height="20%" /><img src="demo/figures/plot_ppc_var2.png" alt=" " width="49%" height="20%" />
+<img src="demo_figures/plot_ppc_var1.png" alt=" " width="49%" height="20%" /><img src="demo_figures/plot_ppc_var2.png" alt=" " width="49%" height="20%" />
 <p class="caption">
 </p>
 
