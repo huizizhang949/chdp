@@ -16,6 +16,7 @@ set.seed(3901)
 test1 <- pkernelHDP_mcmc(Y=list(Y1,Y2), t=list(t1,t2), niter=5000, J=6, burn_in = 3000, thinning = 1,
                          empirical_z=TRUE, target_accept=0.234, mu_h = -2)
 # 1.719 mins
+# 36.63 secs
 save(test1,file='man/test1.RData')
 
 # compute optimal clustering, here the argument pkernel_output should contain a list
@@ -31,9 +32,9 @@ opt$psm
 # plot psm
 # without distinguishing datasets
 
-# pdf('demo/figures/psm_all_var.pdf',w=6,h=6)
+pdf('demo/figures/psm_all_var.pdf',w=6,h=6)
 mcclust.ext::plotpsm(psm = opt$psm)
-# dev.off()
+dev.off()
 
 # distinguish datasets, note that the first observation in each dataset is not clustered
 
@@ -63,6 +64,7 @@ post_result <- pkernelHDP_mcmc(Y=list(Y1,Y2), t=list(t1,t2), niter=16000, burn_i
                               Z_fix = opt_cl, target_accept=0.234, mu_h = -2)
 
 # 1.451 mins
+# 56.414 secs
 save(post_result,file='man/post_result_var.RData')
 
 # plot posterior samples for time-dependent probabilities
@@ -114,7 +116,7 @@ ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,
                           opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
 
 # plot observed data in black, and the posterior mean of the replicated datasets (red line) and credible intervals (red area)
-# save individual figure by hand
+# save individual figure by hand, w=8, h=8
 plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))
 
 

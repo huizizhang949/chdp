@@ -48,7 +48,7 @@ plot_var_cluster <- function(Y, t, opt_cl, data_names=NULL, color_pal=NULL, nrow
     theme_bw()+
     labs(color='cluster',shape='cluster',y='')+
     theme(legend.position = 'bottom')+
-    facet_grid(y ~ dataset,scales="free_y")
+    ggh4x::facet_grid2(y ~ dataset,scales="free_y",independent='y')
 
   if(!is.null(color_pal)){
     gg <- gg+scale_color_manual(values=color_pal)

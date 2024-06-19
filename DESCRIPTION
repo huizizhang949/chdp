@@ -28,9 +28,8 @@ Imports:
     irlba,
     sets,
     truncnorm,
-    matrixNormal,
     MCMCpack,
-    mvnfast,
+    mniw,
     mclust,
     pheatmap,
     mcclust.ext,
@@ -48,4 +47,5 @@ Imports:
     RColorBrewer,
     grid,
     ggplotify,
-    reshape2
+    reshape2,
+    ggh4x

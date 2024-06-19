@@ -73,7 +73,6 @@ Q_J_D_update_pkernel <- function(Z, alpha, P, Xi_C_D, t, mu_J_D, lambda_J_D, sig
 }
 
 ##--------------- Simulation of allocations ----------------
-
 allocation_variables_update_pkernel <- function(Y, X, t, L_1_J, Sigma_1_J, Q_J_D,
                                         mu_J_D, lambda_J_D, sigma_2_J_D){
 
@@ -96,42 +95,46 @@ allocation_variables_update_pkernel <- function(Y, X, t, L_1_J, Sigma_1_J, Q_J_D
 
   for(d in 1:D){
 
-    loop.result <- vapply(1:C_d[d], function(cc) {
+    # n *J
+    Q_mat <- matrix(rep(Q_J_D[,d],C_d[d]),nrow=C_d[d],byrow = TRUE)
+    mu_mat <- matrix(rep(mu_J_D[,d],C_d[d]),nrow=C_d[d],byrow = TRUE)
+    lambda_mat <- matrix(rep(lambda_J_D[,d],C_d[d]),nrow=C_d[d],byrow = TRUE)
+    sigma_2_mat <- matrix(rep(sigma_2_J_D[,d],C_d[d]),nrow=C_d[d],byrow = TRUE)
+    t_mat <- matrix(rep(t[[d]],J),nrow=C_d[d],byrow = FALSE)
 
-      ## Set log probability
-      LP <- vapply(1:J, function(j) {
+    # n * J
+    LP1 <- -2/sigma_2_mat*(sin((t_mat-mu_mat)/lambda_mat))^2+log(Q_mat)
+    LP2 <- lapply(1:J,function(j) {
+      temp <- mniw::dmNorm(as.matrix(Y[[d]]), mu=as.matrix(means_by_j[[d]][[j]]), Sigma = Sigma_1_J[[j]], log = TRUE)
+      return(temp)
+    })
+    LP2 <- do.call(cbind,LP2)
+    LP <- LP1+LP2
 
-        val1 <- -2/sigma_2_J_D[j,d]
-        val2 <- sin((t[[d]][cc]-mu_J_D[j,d])/lambda_J_D[j,d])
-        log_pkernel_value <- val1*val2^2
+    nc <- -apply(LP,1,max) # length=n
+    # n * J
+    LP_plus_nc <- LP+matrix(rep(nc,J),ncol=J,byrow = FALSE)
 
-        lp_val <- mvnfast::dmvn(matrix(Y[[d]][cc,], nrow=1), mu=matrix(means_by_j[[d]][[j]][cc,], nrow=1), sigma = Sigma_1_J[[j]], log = TRUE)+
-          log(Q_J_D[j,d]) + log_pkernel_value
 
-        return(lp_val)
+    P <- t(apply(LP_plus_nc, 1, function(x) {
+      exp(x)/sum(exp(x))
+    }))
 
-      }, FUN.VALUE = numeric(1))
-
-      # Compute the normalizing constant
-      nc <- -max(LP)
-      P <- exp(LP+nc)/sum(exp(LP+nc)) # LP is a vector of length J
-      Z <- sample(1:J, 1, prob=P)
-
-      return(Z)
-
-    }, FUN.VALUE = numeric(1))
-
-    Z[[d]] <- loop.result
+    Z[[d]] <- apply(P, 1, function(x) extraDistr::rcat(1, prob=x))
   }
 
 
   return(Z)
 }
 
+
 ##--------------- Simulation of unique parameters --------------
-unique_params_update <- function(Y, X, J, Z, L0, V0, Phi0, omega0){
+unique_params_update <- function(Y,X,J,Z,L0,V0,Phi0,omega0,iter_num){
 
   D <- length(Y)
+
+  V0_inv <- solve(V0)
+  temp <- Matrix::crossprod(L0,V0_inv)%*%L0
 
   loop.result <- lapply(1:J,function(j) {
 
@@ -142,20 +145,19 @@ unique_params_update <- function(Y, X, J, Z, L0, V0, Phi0, omega0){
       Y_j <- do.call(rbind,lapply(1:D,function(d) Y[[d]][Z[[d]]==j,]))
       X_j <- do.call(rbind,lapply(1:D,function(d) X[[d]][Z[[d]]==j,]))
 
-      V0_inv <- Matrix::solve(V0)
-      Vn <- Matrix::solve(Matrix::crossprod(X_j, X_j)+V0_inv)
-      Ln <- Vn%*%(Matrix::crossprod(X_j, Y_j)+V0_inv%*%L0)
+      Vn <- Matrix::solve(Matrix::crossprod(X_j,X_j)+V0_inv)
+      Ln <- Vn%*%(Matrix::crossprod(X_j,Y_j)+V0_inv%*%L0)
 
-      Phi_n <- Phi0+Matrix::crossprod(Y_j, Y_j)+Matrix::crossprod(L0, V0_inv)%*%L0-Matrix::crossprod(Ln, Matrix::solve(Vn))%*%Ln
+      Phi_n <- Phi0+Matrix::crossprod(Y_j,Y_j)+temp-Matrix::crossprod(Ln,solve(Vn))%*%Ln
       omega_n <- N_j+omega0
 
       Sigma_j_new <- MCMCpack::riwish(omega_n, Phi_n)
-      L_j_new <- matrixNormal::rmatnorm(s=1, Ln, Vn, Sigma_j_new)
+      L_j_new <- mniw::rMNorm(n=1,Lambda=Ln,SigmaR=Vn,SigmaC=Sigma_j_new)
 
     }else{
-      # For empty clusters, draw from the prior
+      # for empty clusters, draw from the prior
       Sigma_j_new <- MCMCpack::riwish(omega0, Phi0)
-      L_j_new <- matrixNormal::rmatnorm(s=1, L0, V0, Sigma_j_new)
+      L_j_new <- mniw::rMNorm(n=1,L0,V0,Sigma_j_new)
 
     }
 
@@ -169,6 +171,7 @@ unique_params_update <- function(Y, X, J, Z, L0, V0, Phi0, omega0){
 
   return(list(L_new=L_new, Sigma_new=Sigma_new))
 }
+
 
 
 ##----------- Simulation of latent variables U_C_J_D for updating kernel parameters----------
