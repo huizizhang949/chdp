@@ -14,7 +14,7 @@ Width <- 100
 Depth <- 200
 
 # for reproducibility
-set.seed(14663)
+set.seed(34891)
 seeds <- sample(1:1e8, Width)
 # parallel computing on 8 cores
 consensus_result <- pblapply(1:Width, function(i) {

@@ -32,6 +32,7 @@ time:
 
 ``` r
 library(chdp)
+library(pbapply)
 # G - dimension (number of genes)
 # C - number of data points in each dataset
 # J - number of clusters
@@ -61,7 +62,7 @@ Depth <- 200
 
 ``` r
 # for reproducibility
-set.seed(14663)
+set.seed(34891)
 seeds <- sample(1:1e8, Width)
 # parallel computing on 8 cores
 consensus_result <- pblapply(1:Width, function(i) {
@@ -218,6 +219,11 @@ Y_latent <- latent_count(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_
 ```
 
 Visualize observed and latent counts on 2D using t-sne
+
+``` r
+set.seed(1)
+plot_tsne(Y = list(t(Y1), t(Y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c25)
+```
 
 <p align="center">
 <img src="demo_figures/tsne_nb.png" width="60%" style="display: block; margin: auto;" />

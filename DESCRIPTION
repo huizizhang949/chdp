@@ -14,7 +14,7 @@ Description: This package implements the MCMC algorithm for
     dataset.
 License: GPL (>= 2)
 Encoding: UTF-8
-RoxygenNote: 7.3.1
+RoxygenNote: 7.3.2
 LazyData: true
 Depends:
     R (>= 3.50)
@@ -49,4 +49,3 @@ Imports:
     ggplotify,
     reshape2,
     ggh4x
-
