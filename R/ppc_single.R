@@ -37,7 +37,7 @@ plot_ppc_single <- function(post_result, Y, opt_cl, data_names = NULL){
   # samples
   mu_star_1_J_output <- post_result$mu_star_1_J_output
   b_output <- post_result$b_output
-  alpha_phi2_output <- post_result$alpha_phi2_output
+  alpha_phi_2_output <- post_result$alpha_phi_2_output
   Beta_output <- post_result$Beta_output
 
   ##-- Data frame for the real data
@@ -88,7 +88,7 @@ plot_ppc_single <- function(post_result, Y, opt_cl, data_names = NULL){
 
   mu.sample <- mu_star_1_J_output[[i]]
   b.sample <- b_output[[i]]
-  alpha_phi2.sample <- alpha_phi2_output[i]
+  alpha_phi_2.sample <- alpha_phi_2_output[i]
   Beta.sample <- Beta_output[[i]]
 
 
@@ -101,7 +101,7 @@ plot_ppc_single <- function(post_result, Y, opt_cl, data_names = NULL){
     ##-- If quadratic
     phi <- matrix(rlnorm(n = J*G,
                          meanlog = b.sample[1]+b.sample[2]*log(mu.sample)+b.sample[3]*log(mu.sample)^2,
-                         sdlog = sqrt(alpha_phi2.sample)),
+                         sdlog = sqrt(alpha_phi_2.sample)),
                   nrow = J,
                   ncol = G)
   }else{
@@ -109,7 +109,7 @@ plot_ppc_single <- function(post_result, Y, opt_cl, data_names = NULL){
     ##-- If linear
     phi <- matrix(rlnorm(n = J*G,
                          meanlog = as.vector(b.sample[1]+b.sample[2]*log(mu.sample)),
-                         sdlog = sqrt(alpha_phi2.sample)),
+                         sdlog = sqrt(alpha_phi_2.sample)),
                   nrow = J,
                   ncol = G)
   }

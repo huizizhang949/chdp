@@ -34,7 +34,7 @@ psm_list_consensus <- function(Ws, Ds, consensus_result){
 
   psm_list <- NULL
   for (i in 1:length(Ws)) {
-    psm_list[[i]] <- lapply(1:length(Ds), function(j) {
+    psm_list[[i]] <- pbapply::pblapply(1:length(Ds), cl=num.cores, function(j) {
       if(Ws[i]==1) {
         mat <- mcclust::comp.psm(matrix(z_mat_list_by_d[[j]][1,],nrow=1))
       }else{
@@ -110,6 +110,7 @@ plot_consensus <- function(Ws, Ds, psm_list){
     theme_bw()+theme(legend.position='bottom')
 
   gridExtra::grid.arrange(g1,g2,ncol=2)
+  return(list(d=mean_abs_mat_d,w=mean_abs_mat_w))
 }
 
 

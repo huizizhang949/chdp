@@ -77,8 +77,8 @@ ppp_mixed <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
   mu.sample <- lapply(index,
                       function(t) post_result$mu_star_1_J_output[[t]])
 
-  alpha.phi2.sample <- sapply(index,
-                              function(t) post_result$alpha_phi2_output[t])
+  alpha.phi_2.sample <- sapply(index,
+                              function(t) post_result$alpha_phi_2_output[t])
 
   b.sample <- lapply(index,
                      function(t) post_result$b_output[[t]])
@@ -92,7 +92,7 @@ ppp_mixed <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
 
                            matrix(rlnorm(n = J*G,
                                          meanlog = b.sample[[i]][1]+b.sample[[i]][2]*log(mu.sample[[i]])+b.sample[[i]][3]*log(mu.sample[[i]])^2,
-                                         sdlog = sqrt(alpha.phi2.sample[i])),
+                                         sdlog = sqrt(alpha.phi_2.sample[i])),
                                   nrow = J,
                                   ncol = G)
                          })
@@ -104,7 +104,7 @@ ppp_mixed <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
 
                            matrix(rlnorm(n = J*G,
                                          meanlog = b.sample[[i]][1]+b.sample[[i]][2]*log(mu.sample[[i]]),
-                                         sdlog = sqrt(alpha.phi2.sample[i])),
+                                         sdlog = sqrt(alpha.phi_2.sample[i])),
                                   nrow = J,
                                   ncol = G)
 

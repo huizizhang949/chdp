@@ -769,7 +769,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   }
 
   ## Return the list
-  my_list <- list('b_output' = b_output, 'alpha_phi2_output' = alpha_phi_2_output, 'Z_output' = Z_output,
+  my_list <- list('b_output' = b_output, 'alpha_phi_2_output' = alpha_phi_2_output, 'Z_output' = Z_output,
                   'P_C_J_D_output' = P_C_J_D_output,  'P_output' = P_output, 'alpha_output' = alpha_output,
                   'alpha_0_output' = alpha_0_output, 'mu_star_1_J_output' = mu_star_1_J_output,
                   'phi_star_1_J_output' = phi_star_1_J_output, 'Beta_output' = Beta_output,

@@ -97,7 +97,8 @@ Choose a suitable value based on mean absolute difference (MAD) between
 PSMs
 
 ``` r
-plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
+# also return the MADs
+mads <- plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 ```
 
 <p align="center">

@@ -32,7 +32,7 @@ ppc_multiple <- function(post_result, Y, opt_cl, number_rep, mc.cores=8){
 
   # samples
   mu_star_1_J_output <- post_result$mu_star_1_J_output
-  alpha_phi_2_output <- post_result$alpha_phi2_output
+  alpha_phi_2_output <- post_result$alpha_phi_2_output
   Beta_output <- post_result$Beta_output
   b_output <- post_result$b_output
 
