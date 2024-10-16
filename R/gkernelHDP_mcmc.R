@@ -49,7 +49,7 @@
 #' @return \code{gkernelHDP_mcmc} returns a list containing the following components:
 #' \item{output_index}{total number of saved MCMC samples, taking into account of burn-in and thinning.}
 #' \item{b_output}{a list of vectors for sampled \eqn{\mathbf{b}}. The list is of length \code{output_index}.}
-#' \item{alpha_phi2_output}{a vector for sampled \eqn{\alpha_{\phi}^2}. The vector is of length \code{output_index}.}
+#' \item{alpha_phi_2_output}{a vector for sampled \eqn{\alpha_{\phi}^2}. The vector is of length \code{output_index}.}
 #' \item{Z_output}{If \code{Z_fix} is not provided, a list of length \code{output_index}. Each element of
 #' the list is a list of two vectors saving the allocations in individual dataset. Otherwise is \code{NULL}.}
 #' \item{P_C_J_D_output}{a list of length two, each corresponding to a single dataset. Each element of the list is
