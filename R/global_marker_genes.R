@@ -125,7 +125,7 @@ global_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL,
 #'
 #' @param global_output output from \code{global_marker_genes}.
 #'
-#' @return Three plots: 1. Tail probabilities against mean absolute LFC based on mean expression, and the threshold value to decide global DE genes.
+#' @return the output contains three ggplot objects:: 1. Tail probabilities against mean absolute LFC based on mean expression, and the threshold value to decide global DE genes.
 #' 2. Tail probabilities against mean absolute LFC based on dispersion, and the threshold value to decide global DD genes.
 #' 3. A bar-chart summarizing the overlap between DE and DD genes.
 #' @export
@@ -142,7 +142,7 @@ plot_global_marker_genes <- function(global_output){
     labs(x='Mean absolute log-fold change',y='Tail probability',title = 'Global DE')
 
   p2 <- ggplot(data = global_output$phi.output,aes(x=mean.lfc,y=tail.prob,col=DD))+
-    geom_point(show.legend = F,size=0.5)+
+    geom_point(show.legend = F, size=0.5)+
     theme_bw()+
     scale_color_manual(values = c('Yes'='red','No'='grey'))+
     geom_hline(yintercept = global_output$alpha_d,linetype='dashed')+
@@ -154,11 +154,12 @@ plot_global_marker_genes <- function(global_output){
   p3 <- ggplot(data = df, aes(x=DE,fill=DD))+
     geom_bar(position = 'dodge')+
     theme_bw()+
+    scale_fill_manual(values = c('DD'='red','non_DD'='grey'))+
     labs(x='Differentially expressed or not',y='Number of genes',
          fill='Classify phi', title='Classfication of genes')+
     theme(legend.position = 'right')
 
-  return(gridExtra::grid.arrange(p1,p2,p3,nrow=1))
+  return(list(p1,p2,p3))
 
 }
 

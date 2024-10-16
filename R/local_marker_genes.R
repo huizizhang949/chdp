@@ -38,7 +38,7 @@ local_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL, 
   pairs <- combn(1:J,2)
 
   # compute tail probabilities for each gene, for every pair
-  loop_local_output <- lapply(1:G, function(g) {
+  loop_local_output <- pblapply(1:G, cl=mc.cores, function(g) {
 
     temp <- apply(pairs, 2, function(vec) {
       j <- vec[1]

@@ -10,7 +10,7 @@ plot_global_marker_genes(global_output)
 \item{global_output}{output from \code{global_marker_genes}.}
 }
 \value{
-Three plots: 1. Tail probabilities against mean absolute LFC based on mean expression, and the threshold value to decide global DE genes.
+the output contains three ggplot objects:: 1. Tail probabilities against mean absolute LFC based on mean expression, and the threshold value to decide global DE genes.
 2. Tail probabilities against mean absolute LFC based on dispersion, and the threshold value to decide global DD genes.
 3. A bar-chart summarizing the overlap between DE and DD genes.
 }

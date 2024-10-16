@@ -245,7 +245,8 @@ Get a summary of global marker genes
 ``` r
 # plot tail probabilities against mean absolute log-fold change (LFC) for all genes, in terms of
 # mean expression and dispersion parameter. Also summarize the overlaps between global DE and DD genes
-plot_global_marker_genes(global_output = global_result)
+ggs_global <- plot_global_marker_genes(global_output = global_result)
+gridExtra::grid.arrange(grobs=ggs_global,nrow=2,ncol=2)
 ```
 
 <p align="center">
