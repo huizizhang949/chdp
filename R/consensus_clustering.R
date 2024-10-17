@@ -13,7 +13,7 @@
 #' @export
 #'
 #' @examples
-#' psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
+#' psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result, mc.cores = 4)
 psm_list_consensus <- function(Ws, Ds, consensus_result, mc.cores = 8){
 
   # ---- a list of length = max(Ws), each contains the Z_output (a list of length = niter, within each there two lists of allocations for two datasets) ----

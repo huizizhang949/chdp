@@ -23,5 +23,5 @@ level corresponds to different depths.
 For each combination of width and depth, compute the corresponding posterior similarity matrix.
 }
 \examples{
-psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
+psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result, mc.cores = 4)
 }
