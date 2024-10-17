@@ -37,7 +37,7 @@ Ds <- c(1,seq(20,200,by=10))
 Ws <- c(1,seq(10,100,by=5))
 
 # a list of posterior similarity matrices for different combination W and D
-psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
+psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result, mc.cores = 4)
 # plot mean absolute difference to determine suitable width and depth
 pdf(file='demo_figures/plot_consensus.pdf',w=10,h=8)
 mads <- plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)

@@ -90,7 +90,7 @@ Compute posterior similarity matrices (PSM) for different combinations
 of W and D
 
 ``` r
-psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
+psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result, mc.cores = 4)
 ```
 
 Choose a suitable value based on mean absolute difference (MAD) between
