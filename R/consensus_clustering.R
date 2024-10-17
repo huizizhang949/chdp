@@ -6,6 +6,7 @@
 #' @param Ws a vector of candidate values for widths.
 #' @param Ds a vector of candidate values for depths.
 #' @param consensus_result a list of outputs from \code{gkernelHDP_mcmc}.
+#' @param mc.cores number of cores used for parallel computing.
 #'
 #' @return a list of list of posterior similarity matrices. The outer level corresponds to different widths and the inner
 #' level corresponds to different depths.
@@ -13,7 +14,7 @@
 #'
 #' @examples
 #' psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
-psm_list_consensus <- function(Ws, Ds, consensus_result){
+psm_list_consensus <- function(Ws, Ds, consensus_result, mc.cores = 8){
 
   # ---- a list of length = max(Ws), each contains the Z_output (a list of length = niter, within each there two lists of allocations for two datasets) ----
   mcmc_z_result <- lapply(1:max(Ws), function(w) {
@@ -34,7 +35,7 @@ psm_list_consensus <- function(Ws, Ds, consensus_result){
 
   psm_list <- NULL
   for (i in 1:length(Ws)) {
-    psm_list[[i]] <- pbapply::pblapply(1:length(Ds), cl=num.cores, function(j) {
+    psm_list[[i]] <- pbapply::pblapply(1:length(Ds), cl=mc.cores, function(j) {
       if(Ws[i]==1) {
         mat <- mcclust::comp.psm(matrix(z_mat_list_by_d[[j]][1,],nrow=1))
       }else{

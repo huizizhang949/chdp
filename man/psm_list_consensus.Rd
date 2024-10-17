@@ -4,7 +4,7 @@
 \alias{psm_list_consensus}
 \title{Compute posterior similarity matrix from consensus clustering}
 \usage{
-psm_list_consensus(Ws, Ds, consensus_result)
+psm_list_consensus(Ws, Ds, consensus_result, mc.cores = 8)
 }
 \arguments{
 \item{Ws}{a vector of candidate values for widths.}
@@ -12,6 +12,8 @@ psm_list_consensus(Ws, Ds, consensus_result)
 \item{Ds}{a vector of candidate values for depths.}
 
 \item{consensus_result}{a list of outputs from \code{gkernelHDP_mcmc}.}
+
+\item{mc.cores}{number of cores used for parallel computing.}
 }
 \value{
 a list of list of posterior similarity matrices. The outer level corresponds to different widths and the inner
