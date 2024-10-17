@@ -40,7 +40,7 @@ Ws <- c(1,seq(10,100,by=5))
 psm_list <- psm_list_consensus(Ws = Ws, Ds = Ds, consensus_result = consensus_result)
 # plot mean absolute difference to determine suitable width and depth
 pdf(file='demo_figures/plot_consensus.pdf',w=10,h=8)
-plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
+mads <- plot_consensus(Ws = Ws, Ds = Ds, psm_list = psm_list)
 dev.off()
 
 # after choosing suitable W and D, compute optimal clustering

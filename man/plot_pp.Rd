@@ -36,7 +36,7 @@ plot_pp(
 \item{xlab}{(optional) string. The label for x-axis in the plot.}
 }
 \value{
-one plot for each datases that contains subpanels for clusters, showing PC1 against covariate with
+one plot for each dataset that contains subpanels for clusters, showing PC1 against covariate with
 observations colored by PP.
 \item{PP_mean}{A list of matrices. Each is a cell-by-cluster matrix of posterior probabilities, for one dataset.}
 \item{gglist}{A list of items for each dataset. Each item has ggplot objects saving the plots.}

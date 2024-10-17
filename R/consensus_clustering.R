@@ -110,7 +110,7 @@ plot_consensus <- function(Ws, Ds, psm_list){
     labs(x='W')+
     theme_bw()+theme(legend.position='bottom')
 
-  gridExtra::grid.arrange(g1,g2,ncol=2)
+  print(gridExtra::grid.arrange(g1,g2,ncol=2))
   return(list(d=mean_abs_mat_d,w=mean_abs_mat_w))
 }
 
