@@ -257,7 +257,7 @@ ppp_hist_cl <- function(ppp_output, nrow=1, data_names=NULL){
     # only consider non-empty clusters
     Js <- sort(unique(ppp_output$cluster[ppp_output$dataset==d]),decreasing = FALSE)
 
-    par(mfrow=c(nrow,floor(length(Js/nrow))))
+    par(mfrow=c(nrow,floor(length(Js)/nrow)))
 
     for(j in Js){
       hist(ppp_output$Dis.1[ppp_output$cluster==j & ppp_output$dataset==d],
@@ -277,7 +277,7 @@ ppp_hist_cl <- function(ppp_output, nrow=1, data_names=NULL){
     # only consider non-empty clusters
     Js <- sort(unique(ppp_output$cluster[ppp_output$dataset==d]),decreasing = FALSE)
 
-    par(mfrow=c(nrow,floor(length(Js/nrow))))
+    par(mfrow=c(nrow,floor(length(Js)/nrow)))
 
     for(j in Js){
       hist(ppp_output$Dis.2[ppp_output$cluster==j & ppp_output$dataset==d],
@@ -297,7 +297,7 @@ ppp_hist_cl <- function(ppp_output, nrow=1, data_names=NULL){
     # only consider non-empty clusters
     Js <- sort(unique(ppp_output$cluster[ppp_output$dataset==d]),decreasing = FALSE)
 
-    par(mfrow=c(nrow,floor(length(Js/nrow))))
+    par(mfrow=c(nrow,floor(length(Js)/nrow)))
 
     for(j in Js){
       hist(ppp_output$Dis.3[ppp_output$cluster==j & ppp_output$dataset==d],
