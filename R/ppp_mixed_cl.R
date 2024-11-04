@@ -60,6 +60,7 @@ Discrepancy_measures_cl <- function(Y,
 #' based on Chi-squared statistic, Freeman-Tukey statistic
 #' and dropout probabilities.
 #'
+#' @import data.table
 #'
 #' @param post_result output from \code{gkernelHDP_mcmc} for the post-processing step.
 #' @param Y a list of matrices. Each matrix is a gene-by-cell matrix of mRNA counts corresponding to a dataset.
@@ -191,15 +192,15 @@ ppp_mixed_cl <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
 
     Js <- sort(unique(opt_cl[[d]]),decreasing = FALSE)
 
-    p_value[[d]] <- lapply(1:G,
+    p_value[[d]] <- pblapply(1:G,
                            function(g){
 
                             temp <- lapply(Js, function(j){
                               # For y rep
-                              p_value_rep_dgj <- y.rep.Dis[y.rep.Dis$dataset == d & y.rep.Dis$gene == g & y.rep.Dis$cluster==j,]
+                              p_value_rep_dgj <- y.rep.Dis[dataset == d & gene == g & cluster==j,]
 
                               # For y obs
-                              p_value_obs_dgj <- y.Dis[y.Dis$dataset == d & y.Dis$gene == g & y.Dis$cluster==j,]
+                              p_value_obs_dgj <- y.Dis[dataset == d & gene == g & cluster==j,]
 
                               # Output a data frame
                               return(data.frame(dataset = d,
@@ -213,7 +214,7 @@ ppp_mixed_cl <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
 
                             return(do.call(rbind, temp))
 
-                           })
+                           }, cl=mc.cores)
 
     p_value[[d]] <- do.call(rbind,
                             p_value[[d]])
