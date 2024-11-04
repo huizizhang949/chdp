@@ -146,7 +146,7 @@ latent_counts_heatmap <- function(Y_latent, opt_cl, global_output){
   }
   # vertical dashed line to separate datasets
   for (i in 1:length(cum_prop_d)) {
-    grid::grid.lines(x=cum_prop_d[i],y=c(0,1), gp=grid::gpar(col="yellow", lwd=2,ltY_latent=2))
+    grid::grid.lines(x=cum_prop_d[i],y=c(0,1), gp=grid::gpar(col="yellow", lwd=2,lty=2))
   }
   grid::grid.lines(x=c(0,1),y=1-mean(global_output$mu.output$tail.prob>alpha_m), gp=grid::gpar(col="red", lwd=2,lty=2))
   grid::popViewport()

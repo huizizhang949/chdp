@@ -18,6 +18,7 @@ test1 <- pkernelHDP_mcmc(Y=list(Y1,Y2), t=list(t1,t2), niter=5000, J=6, burn_in 
 # 1.719 mins
 # 36.63 secs
 save(test1,file='man/test1.RData')
+save(test1,file='man/teset1-rerun.RData')
 
 # compute optimal clustering, here the argument pkernel_output should contain a list
 # of outputs from pkernelHDP_mcmc.
