@@ -553,7 +553,7 @@ predictions are made further away.
 # predict future observations, and computes credible intervals.
 set.seed(2)
 pred_trend_result <- pred_trend(post_result = post_result, Y=list(Y1,Y2),
-                                t_pred = 1+(diff(t1)[1])*(1:10), prob = c(0.005,0.995), mc.cores = 2)
+                                t_pred = 1+(diff(t1)[1])*(1:10), prob = 0.95, mc.cores = 2)
 
 # plot posterior predictive means and associated credible intervals, in addition to observed data (black), for each feature.
 plot_pred_trend(pred_trend_output = pred_trend_result, Y=list(Y1,Y2), t_obs = list(t1,t2))
@@ -596,7 +596,7 @@ intervals of the replicates with the observed data
 # the mean and credible intervals
 set.seed(2)
 ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
-                          opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
+                          opt_cl = opt_cl, number_rep = 200, prob = 0.95, mc.cores = 2)
 
 # plot observed data in black, and the posterior mean of the replicated datasets (red line) and credible intervals (red area)
 plot_ppc_var(ppc_var_output = ppc_var_result, Y=list(Y1,Y2))

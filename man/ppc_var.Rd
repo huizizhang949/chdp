@@ -4,15 +4,7 @@
 \alias{ppc_var}
 \title{Perform posterior predictive checks}
 \usage{
-ppc_var(
-  post_result,
-  Y,
-  t,
-  opt_cl,
-  number_rep,
-  prob = c(0.005, 0.995),
-  mc.cores = 8
-)
+ppc_var(post_result, Y, t, opt_cl, number_rep, prob = 0.95, mc.cores = 8)
 }
 \arguments{
 \item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
@@ -40,5 +32,5 @@ the mean and credible intervals.
 }
 \examples{
 ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
-                          opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
+                          opt_cl = opt_cl, number_rep = 200, prob = 0.95, mc.cores = 2)
 }

@@ -4,14 +4,7 @@
 \alias{conditional_mean}
 \title{Compute conditional mean in the VAR likelihood}
 \usage{
-conditional_mean(
-  Y,
-  t,
-  opt_cl,
-  post_result,
-  prob = c(0.005, 0.995),
-  mc.cores = 8
-)
+conditional_mean(Y, t, opt_cl, post_result, prob = 0.95, mc.cores = 8)
 }
 \arguments{
 \item{Y}{a list of two matrices for two datasets. The columns correspond to features.}
@@ -37,5 +30,5 @@ This function calculates the mean conditional on the past observation as well as
 }
 \examples{
 conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl,
-    post_result = post_result, prob = c(0.005,0.995), mc.cores = 2)
+    post_result = post_result, prob = 0.95, mc.cores = 2)
 }

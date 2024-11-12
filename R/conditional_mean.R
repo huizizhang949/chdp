@@ -19,9 +19,9 @@
 #'
 #' @examples
 #' conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl,
-#'     post_result = post_result, prob = c(0.005,0.995), mc.cores = 2)
+#'     post_result = post_result, prob = 0.95, mc.cores = 2)
 
-conditional_mean <- function(Y, t, opt_cl, post_result, prob=c(0.005,0.995), mc.cores=8){
+conditional_mean <- function(Y, t, opt_cl, post_result, prob=0.95, mc.cores=8){
 
   D <- length(Y); G <- ncol(Y[[1]])
   L <- post_result$output_index
@@ -70,7 +70,7 @@ conditional_mean <- function(Y, t, opt_cl, post_result, prob=c(0.005,0.995), mc.
 
   # an array of dimension n_obs * G * n_sample
   arr <- array(unlist(Y_mean_list), c(nrow(Y_df),G,L))
-  quant <- apply(arr,1:2,quantile,prob=prob)
+  quant <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(mcmc(x),prob=prob)))
   # turn into a list of length = G
   quant_list <- lapply(1:G, function(p) {
     df_quant <- as.data.frame(t(quant[,,p]))

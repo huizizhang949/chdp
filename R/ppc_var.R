@@ -19,8 +19,8 @@
 #'
 #' @examples
 #' ppc_var_result <- ppc_var(post_result = post_result, Y=list(Y1,Y2), t = list(t1,t2),
-#'                           opt_cl = opt_cl, number_rep = 200, prob = c(0.005,0.995), mc.cores = 2)
-ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=c(0.005,0.995), mc.cores=8){
+#'                           opt_cl = opt_cl, number_rep = 200, prob = 0.95, mc.cores = 2)
+ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=0.95, mc.cores=8){
 
   L <- post_result$output_index
   G <- ncol(Y[[1]])
@@ -80,7 +80,7 @@ ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=c(0.005,0.995), 
 
   # an array of dimension n_obs * G * number_rep
   arr <- array(unlist(lapply(Y.rep.list,function(x) x[,1:G])), c(nrow(Y_df),G,number_rep))
-  quant.rep <- apply(arr,1:2,quantile,prob=prob)
+  quant.rep <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(mcmc(x),prob=prob)))
   # turn into a list of length=G
   quant.rep.list <- lapply(1:G, function(p) {
     df <- as.data.frame(t(quant.rep[,,p]))
