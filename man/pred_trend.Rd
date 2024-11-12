@@ -4,7 +4,7 @@
 \alias{pred_trend}
 \title{Predictions of future trends}
 \usage{
-pred_trend(post_result, Y, t_pred, prob = c(0.005, 0.995), mc.cores = 8)
+pred_trend(post_result, Y, t_pred, prob = 0.99, mc.cores = 8)
 }
 \arguments{
 \item{post_result}{output from \code{pkernelHDP_mcmc} for the post-processing step.}
@@ -28,5 +28,5 @@ This function predicts future observations, and computes credible intervals.
 }
 \examples{
 pred_trend_result <- pred_trend(post_result = post_result, Y=list(Y1,Y2), t_pred = c(1.1,1.2),
-                                prob = c(0.005,0.995), mc.cores = 2)
+                                prob = 0.99, mc.cores = 2)
 }

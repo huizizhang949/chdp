@@ -141,7 +141,7 @@ plot_ppc_var <- function(ppc_var_output, Y){
         geom_line(data=Y.rep.mean[ix,],aes(x=t,y=Y.rep.mean[ix,p]),col='red',lwd=0.3)+
         geom_ribbon(data=temp,aes(x=t,ymin=lower,ymax=upper),fill='red',alpha=0.3)+
         theme_bw()+
-        labs(y=paste0('y',p))
+        labs(y=paste0('y',p),x='time')
 
     })
 
