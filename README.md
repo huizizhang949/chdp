@@ -533,7 +533,7 @@ relies on the past observation.
 # ------ conditional mean ------
 # calculates the mean conditional on the past observation as well as credible intervals
 conditional_mean_result <- conditional_mean(Y=list(Y1,Y2), t=list(t1,t2), opt_cl = opt_cl, post_result = post_result,
-                                            prob = c(0.005,0.995), mc.cores = 2)
+                                            prob = 0.95, mc.cores = 2)
 
 # plots the posterior mean and credible intervals for the conditional mean, for the specified dataset and cluster
 plot_conditional_mean(conditional_mean_output = conditional_mean_result, data = 1, cluster = 1)
