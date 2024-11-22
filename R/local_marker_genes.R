@@ -25,7 +25,7 @@
 local_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL, alpha_d=NULL,
                                mc.cores=8){
 
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- nrow(post_result$mu_star_1_J_output[[1]])
   G <- ncol(post_result$mu_star_1_J_output[[1]])
   L <- post_result$output_index
 
@@ -228,7 +228,7 @@ plot_local_marker_genes <- function(local_output, nrow=2){
 #' gridExtra::grid.arrange(grobs=heatmaps_ggs_local$phi.ggs,nrow=1)
 local_marker_genes_heatmaps <- function(local_output, post_result){
 
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- nrow(post_result$mu_star_1_J_output[[1]])
   L <- post_result$output_index
   mu.sample <- post_result$mu_star_1_J_output
   phi.sample <- post_result$phi_star_1_J_output

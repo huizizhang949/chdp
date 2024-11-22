@@ -27,7 +27,7 @@ global_marker_genes <- function(post_result, threshold=c(2.5,2.5), alpha_m=NULL,
                                 mc.cores=8){
 
 
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- nrow(post_result$mu_star_1_J_output[[1]])
   G <- ncol(post_result$mu_star_1_J_output[[1]])
   L <- post_result$output_index
 
@@ -185,7 +185,7 @@ plot_global_marker_genes <- function(global_output){
 #' global_marker_genes_heatmaps(global_output = global_result, post_result = post_result)
 global_marker_genes_heatmaps <- function(global_output, post_result){
 
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- nrow(post_result$mu_star_1_J_output[[1]])
   L <- post_result$output_index
   mu.sample <- post_result$mu_star_1_J_output
   phi.sample <- post_result$phi_star_1_J_output

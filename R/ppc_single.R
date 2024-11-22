@@ -26,7 +26,7 @@ plot_ppc_single <- function(post_result, Y, opt_cl, data_names = NULL){
   G <- nrow(Y[[1]])
   D <- length(Y)
   C <- sapply(Y, ncol)
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- length(unique(unlist(opt_cl)))
   L <- post_result$output_index
   Z <- opt_cl
 

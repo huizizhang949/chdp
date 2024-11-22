@@ -79,7 +79,7 @@ Discrepancy_measures_cl <- function(Y,
 ppp_mixed_cl <- function(post_result, Y, opt_cl, number_rep, mc.cores = 8){
 
   ##-- Input data
-  C <- sapply(opt_cl, function(x) length(x))
+  C <- sapply(Y, ncol)
   J <- length(unique(unlist(opt_cl)))
   G <- nrow(Y[[1]])
   D <- length(Y)

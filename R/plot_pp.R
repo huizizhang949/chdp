@@ -36,7 +36,7 @@ plot_pp <- function(post_result, Y, t, data_names=NULL, nrow=1,
   Y_all <- t(do.call(cbind, Y))
   D <- length(Y)
   C <- sapply(Y, ncol)
-  J <- ncol(post_result$P_C_J_D_output[[1]][[1]])
+  J <- nrow(post_result$mu_star_1_J_output[[1]])
   L <- post_result$output_index
 
   ind <- 1:L
