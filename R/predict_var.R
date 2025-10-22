@@ -99,7 +99,7 @@ pred_trend <- function(post_result, Y, t_pred, prob=0.99, mc.cores=8){
 
   # an array of dimension n_future_obs * G * n_sample
   arr <- array(unlist(lapply(Y.pred.list,function(x) x[,1:G])), c(D*length(t_pred),G,L))
-  quant.pred <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(mcmc(x),prob=prob)))
+  quant.pred <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(coda::mcmc(x),prob=prob)))
   # turn into a list of length=G
   quant.pred.list <- lapply(1:G, function(p) {
     df <- as.data.frame(t(quant.pred[,,p]))

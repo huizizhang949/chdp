@@ -80,7 +80,7 @@ ppc_var <- function(post_result, Y, t, opt_cl, number_rep, prob=0.95, mc.cores=8
 
   # an array of dimension n_obs * G * number_rep
   arr <- array(unlist(lapply(Y.rep.list,function(x) x[,1:G])), c(nrow(Y_df),G,number_rep))
-  quant.rep <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(mcmc(x),prob=prob)))
+  quant.rep <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(coda::mcmc(x),prob=prob)))
   # turn into a list of length=G
   quant.rep.list <- lapply(1:G, function(p) {
     df <- as.data.frame(t(quant.rep[,,p]))

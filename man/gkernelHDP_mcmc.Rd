@@ -5,8 +5,10 @@
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
 gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-    empirical = TRUE, empirical_z = TRUE, Z_fix = NULL, BB_SIZE = TRUE,
-    quadratic = FALSE, MH.variance = 0.01,
+    empirical = TRUE, empirical_z = TRUE, Z_fix = NULL,
+    quadratic = FALSE, MH.variance = 0.01, BB_SIZE = TRUE,
+    baynorm.beta = baynorm.beta, baynorm_tot = baynorm_tot,
+    alpha_initial = 1, alpha_0_initial = 1,
     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
     sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
     beta.mean = 0.06, alpha_mu_2 = NULL,
@@ -41,6 +43,8 @@ post-processing step where allocations are fixed to the optimal clustering to in
 \item{MH.variance}{additional variance added to the empirical covariance (variance) in adaptive Metropolis-Hastings.}
 
 \item{BB_SIZE}{optional. Default to TRUE. See \code{bayNorm} for details.}
+
+\item{alpha_initial, alpha_0_initial}{initial values for concentration parameters \eqn{\alpha,\alpha_0}. Default to 1.}
 
 \item{mu_r, sigma_r}{mean and standard deviation of the hyper-prior (normal) for \eqn{r_j}.}
 

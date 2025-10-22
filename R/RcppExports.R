@@ -2,6 +2,6 @@
 # Generator token: 10BE3573-1514-4C36-9D1C-5A225CD40393
 
 compute_probability_cpp <- function(Y_d, Beta, mu, phi, Q_J, t_d, t_star_J, sigma_star_2_J) {
-    .Call('_chdp_compute_probability_cpp', PACKAGE = 'chdp', Y_d, Beta, mu, phi, Q_J, t_d, t_star_J, sigma_star_2_J)
+    .Call(`_chdp_compute_probability_cpp`, Y_d, Beta, mu, phi, Q_J, t_d, t_star_J, sigma_star_2_J)
 }
 

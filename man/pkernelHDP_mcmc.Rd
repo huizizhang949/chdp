@@ -5,7 +5,7 @@
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two time-series datasets based on VAR likelihood}
 \usage{
 pkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-    empirical_z = TRUE, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
+    empirical_z = TRUE, Z_fix = NULL, J0 = 5, alpha_initial = 1, alpha_0_initial = 1,
     MH.variance = 0.01, target_accept = 0.234,
     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
     sigma_h = 0.5, kappa_1 = 26, kappa_2 = 1)
@@ -31,6 +31,9 @@ is fitted using package \code{mclust}. If \code{empirical_z=FALSE}, clusters are
 \item{Z_fix}{optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
 where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
 post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.}
+
+\item{J0}{A guess of the number of components. Default to 5.
+Used to set up the prior parameters for the covariance matrix in the Gaussian distribution.}
 
 \item{alpha_initial, alpha_0_initial}{initial values for concentration parameters \eqn{\alpha,\alpha_0}.}
 

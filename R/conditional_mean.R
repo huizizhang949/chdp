@@ -70,7 +70,7 @@ conditional_mean <- function(Y, t, opt_cl, post_result, prob=0.95, mc.cores=8){
 
   # an array of dimension n_obs * G * n_sample
   arr <- array(unlist(Y_mean_list), c(nrow(Y_df),G,L))
-  quant <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(mcmc(x),prob=prob)))
+  quant <- apply(arr,1:2,function(x) as.numeric(coda::HPDinterval(coda::mcmc(x),prob=prob)))
   # turn into a list of length = G
   quant_list <- lapply(1:G, function(p) {
     df_quant <- as.data.frame(t(quant[,,p]))

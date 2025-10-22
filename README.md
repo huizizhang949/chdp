@@ -445,7 +445,7 @@ rm(list=ls())
 # z - data allocation
 # t - covariate (time)
 # p_j - covariate-dependent time probabilities
-G=2; C=rep(151,2); J=3
+G=2; C=rep(151,2); J=3; D=2
 # first dataset
 Y1 <- sim2.data[1:C[1],1:G]; z1 <- sim2.data[1:C[1],G+1]; 
 t1 <- sim2.data[1:C[1],G+2]; p_j1 <- sim2.data[1:C[1],-(1:(G+2))]
@@ -473,6 +473,23 @@ opt <- opt_cl_var(pkernel_output = list(test1))
 
 # optimal clustering
 opt_cl <- opt$opt_cl
+# make sure cluster labels are continuous
+Z_unlist <- unlist(opt_cl)
+uniq_cl <- unique(Z_unlist)
+J <- length(uniq_cl)
+Z_updated <- rep(0,sum(C))
+for(j in 1:J){
+  Z_updated[Z_unlist==uniq_cl[j]]=j
+}
+# rearrange in a list
+# Cumulative number of neurons in a vector form
+C_cumsum <- c(0, cumsum(C))
+opt_cl <- lapply(1:D,
+                 function(d) Z_updated[(C_cumsum[d]+1):C_cumsum[d+1]])
+# clean up
+rm(Z_updated, C_cumsum, uniq_cl, Z_unlist, j, J)
+
+
 # posterior similarity matrix based on the chosen W and D
 opt$psm
 
