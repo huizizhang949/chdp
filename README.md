@@ -49,14 +49,33 @@ Y2 <- sim1.data[(C[1]+1):sum(C),1:G]; z2 <- sim1.data[(C[1]+1):sum(C),G+1];
 t2 <- sim1.data[(C[1]+1):sum(C),G+2]; p_j2 <- sim1.data[(C[1]+1):sum(C),-(1:(G+2))]
 ```
 
+Empirical estimates from bayNorm:
+
+``` r
+# ----- Empirical estimate ------
+BB_SIZE <-  TRUE
+Y <- list(t(Y1), t(Y2))
+D <- length(Y)
+beta.mean <- 0.06 # an estimate of global mean capture efficiency across cells, same as in bayNorm method
+# Beta estimate
+baynorm.beta <- lapply(1:D, function(d){
+
+  bayNorm::BetaFun(Data = Y[[d]],MeanBETA = beta.mean)$BETA
+})
+
+# Apply bayNorm to the combined dataset
+baynorm_tot <- bayNorm::bayNorm(Data = do.call(cbind, Y),BETA_vec = unlist(baynorm.beta),
+                                mode_version = TRUE,mean_version = FALSE,BB_SIZE = BB_SIZE)
+```
+
 ## Consensus clustering
 
 To implement consensus clustering, first choose the width (number of
 chains) and depth (length of each chain). Below is an example of running
-consensus clustering, with 100 chains and 200 iterations on 8 cores
+consensus clustering, with 50 chains and 200 iterations on 8 cores
 
 ``` r
-Width <- 100
+Width <- 50
 Depth <- 200
 ```
 
@@ -68,22 +87,18 @@ seeds <- sample(1:1e8, Width)
 consensus_result <- pblapply(1:Width, function(i) {
 
   set.seed(seeds[i])
-  b_inits <- runif(2,-5,5)
-  alpha_inits <- runif(1,0,10)
-  alpha_0_inits <- runif(1,0,10)
-
-  gkernelHDP_mcmc(Y = list(t(Y1), t(Y2)), t = list(t1, t2), J = 7, niter = Depth, burn_in = 0, thinning = 1,
-                 empirical = TRUE, empirical_z = TRUE,
-                 b_initial = b_inits, alpha_initial = alpha_inits, alpha_0_initial = alpha_0_inits,
-                 beta.mean = 0.6)
+  result <- gkernelHDP_mcmc(Y = Y, t = list(t1, t2), J = 7, niter = Depth, burn_in = 0, thinning = 1,
+                            empirical = TRUE, empirical_z = TRUE, BB_SIZE = BB_SIZE,
+                            baynorm.beta = baynorm.beta, baynorm_tot = baynorm_tot, beta.mean = 0.6)
+  return(result)
 }, cl=8)
 ```
 
 Specify a range of candidate values (the first element is the baseline):
 
 ``` r
-Ds <- c(1,seq(20,200,by=10))
-Ws <- c(1,seq(10,100,by=5))
+Ds <- c(1,seq(20,Depth,by=10))
+Ws <- c(1,seq(5,Width,by=5))
 ```
 
 Compute posterior similarity matrices (PSM) for different combinations
@@ -112,6 +127,24 @@ After choosing suitable W and D, compute optimal clustering
 opt <- opt_cl_consensus(W = Width, D = Depth, consensus_result = consensus_result)
 # optimal clustering
 opt_cl <- opt$opt_cl
+# make sure cluster labels are continuous
+Z_unlist <- unlist(opt_cl)
+uniq_cl <- unique(Z_unlist)
+J <- length(uniq_cl)
+Z_updated <- rep(0,sum(C))
+for(j in 1:J){
+  Z_updated[Z_unlist==uniq_cl[j]]=j
+}
+# rearrange in a list
+# Cumulative number of neurons in a vector form
+C_cumsum <- c(0, cumsum(C))
+opt_cl <- lapply(1:D,
+            function(d) Z_updated[(C_cumsum[d]+1):C_cumsum[d+1]])
+# clean up
+rm(Z_updated, C_cumsum, uniq_cl, Z_unlist, j, J)
+
+
+
 # posterior similarity matrix based on the chosen W and D
 opt$psm
 ```
@@ -164,9 +197,10 @@ run a post-processing step
 ``` r
 # post-processing: fix Z to the optimal one from consensus clustering
 set.seed(3)
-post_result <- gkernelHDP_mcmc(Y = list(t(Y1), t(Y2)), t = list(t1, t2),
+post_result <- gkernelHDP_mcmc(Y = Y, t = list(t1, t2),
                                niter = 7000, burn_in = 5000, thinning = 1,
-                               empirical = TRUE, Z_fix = opt_cl, beta.mean = 0.6)
+                               empirical = TRUE, BB_SIZE = BB_SIZE, Z_fix = opt_cl, 
+                               baynorm.beta = baynorm.beta, baynorm_tot = baynorm_tot, beta.mean = 0.6)
 ```
 
 ### Covariate-related results and latent counts
@@ -191,7 +225,7 @@ concatenating the datasets (along gene axis).
 
 ``` r
 # plot first principal component (PC1) against time, with observations colored by PP
-PP_mean_result <- plot_pp(post_result = post_result, Y = list(t(Y1), t(Y2)), t = list(t1, t2),
+PP_mean_result <- plot_pp(post_result = post_result, Y = Y, t = list(t1, t2),
                           data_names = c('data 1', 'data 2'), nrow = 1, mc.cores = 4, xlab='t')
 ```
 
@@ -200,8 +234,7 @@ PP_mean_result <- plot_pp(post_result = post_result, Y = list(t(Y1), t(Y2)), t =
 </p>
 
 And further we can compute posterior mean and highest posterior density
-(HPD) interval for mean latent count as a function of covariate, without
-conditioning on allocations.
+(HPD) interval for mean latent count as a function of covariate.
 
 ``` r
 # the functionalso return the results of posterior mean and HPD.
@@ -216,14 +249,14 @@ mean_latent_counts <- plot_mean_latent_count(post_result = post_result, t = list
 Compute posterior mean of the latent count, conditional on allocations
 
 ``` r
-Y_latent <- latent_count(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_cl, mc.cores = 2)
+Y_latent <- latent_count(post_result = post_result, Y = Y, opt_cl = opt_cl, mc.cores = 2)
 ```
 
 Visualize observed and latent counts on 2D using t-sne
 
 ``` r
 set.seed(1)
-plot_tsne(Y = list(t(Y1), t(Y2)), Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c25)
+plot_tsne(Y = Y, Y_latent = Y_latent, opt_cl = opt_cl, color_pal = c25)
 ```
 
 <p align="center">
@@ -246,7 +279,7 @@ Get a summary of global marker genes
 # plot tail probabilities against mean absolute log-fold change (LFC) for all genes, in terms of
 # mean expression and dispersion parameter. Also summarize the overlaps between global DE and DD genes
 ggs_global <- plot_global_marker_genes(global_output = global_result)
-gridExtra::grid.arrange(grobs=ggs_global,nrow=2,ncol=2)
+gridExtra::grid.arrange(grobs=ggs_global,nrow=1,ncol=3)
 ```
 
 <p align="center">
@@ -293,7 +326,7 @@ ordered by decreasing tail probabilities (DE) from top to bottom
 ``` r
 # a red dashed line separates global and non-globle DE genes. Cells are separated
 # by clusters (yellow vertical solid line) and also separated by datasets within each cluster (yellow vertical dashed line)
-observed_counts_heatmap(Y = list(t(Y1),t(Y2)), opt_cl = opt_cl, global_output = global_result)
+observed_counts_heatmap(Y = Y, opt_cl = opt_cl, global_output = global_result)
 ```
 
 <p align="center">
@@ -354,7 +387,7 @@ from its prior
 # 1. compare the relationship between statistics between replicate (black) and observed data (red)
 # 2. compare differences in statistics between replicate and observed data
 set.seed(2)
-plot_ppc_single(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
+plot_ppc_single(post_result = post_result, Y = Y, opt_cl = opt_cl, data_names = c('data 1', 'data 2'))
 ```
 
 <p align="center">
@@ -365,7 +398,7 @@ plot_ppc_single(post_result = post_result, Y = list(t(Y1), t(Y2)), opt_cl = opt_
 # ------- multiple replicates ---------------
 # generate multiple replicates, and compute key statistics (gene-wise) for replicated and observed data.
 set.seed(3)
-ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = list(t(Y1), t(Y2)),
+ppc_multiple_df <- ppc_multiple(post_result = post_result, Y = Y,
                                 opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 # plot the results from multiple replicates. compare density plots for each statistic between
 # replicated (grey) and observed data (red)
@@ -384,7 +417,7 @@ following functions
 # compute posterior predictive p-values for three discrepancy measures 
 # based on Chi-squared statistic, Freeman-Tukey statistic and dropout probabilities
 set.seed(4)
-ppp_mixed_result <- ppp_mixed(post_result = post_result, Y = list(t(Y1), t(Y2)),
+ppp_mixed_result <- ppp_mixed(post_result = post_result, Y = Y,
                               opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 
 # plot histograms of p-values for each discrepancy measure
@@ -392,7 +425,7 @@ ppp_hist(ppp_output = ppp_mixed_result)
 
 # compute p-values condition on optimal clustering
 set.seed(5)
-ppp_mixed_cl_result <- ppp_mixed_cl(post_result = post_result, Y = list(t(Y1), t(Y2)),
+ppp_mixed_cl_result <- ppp_mixed_cl(post_result = post_result, Y = Y,
                                   opt_cl = opt_cl, number_rep = 200, mc.cores = 2)
 
 # plot histograms for each discrepancy measure, for each cluster and each dataset

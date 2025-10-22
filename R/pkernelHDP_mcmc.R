@@ -23,6 +23,8 @@
 #' @param Z_fix optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
 #' where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
 #' post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.
+#' @param J0 A guess of the number of components. Default to 5.
+#' Used to set up the prior parameters for the covariance matrix in the Gaussian distribution.
 #' @param alpha_initial,alpha_0_initial initial values for concentration parameters \eqn{\alpha,\alpha_0}.
 #' @param MH.variance additional variance added to the empirical covariance (variance) in adaptive Metropolis-Hastings.
 #' @param target_accept the targeted average acceptance rate in adaptive Metropolis-Hastings (Algorithm 5).
@@ -32,7 +34,7 @@
 #' @param kappa_1,kappa_2 shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.
 #'
 #' @usage pkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-#'     empirical_z = TRUE, Z_fix = NULL, alpha_initial = 1, alpha_0_initial = 1,
+#'     empirical_z = TRUE, Z_fix = NULL, J0 = 5, alpha_initial = 1, alpha_0_initial = 1,
 #'     MH.variance = 0.01, target_accept = 0.234,
 #'     mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
 #'     sigma_h = 0.5, kappa_1 = 26, kappa_2 = 1)
@@ -65,7 +67,7 @@
 #'
 #' @export
 pkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-                            empirical_z = TRUE, Z_fix = NULL,
+                            empirical_z = TRUE, Z_fix = NULL, J0 = 5,
                             alpha_initial = 1, alpha_0_initial = 1,
                             MH.variance = 0.01, target_accept = 0.234,
                             mu_r = -2, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -1,
@@ -243,7 +245,7 @@ pkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   # Component probabilities p_j, add 1 to avoid zero p if cluster is empty
   P_initial <- sapply(1:J, function(j) mean(unlist(Z_initial)==j))
   if(any(P_initial==0)){
-    # add 1 to avoid zero p if cluster is empty
+    # Add 1 to avoid zero p if cluster is empty
     P_initial <- sapply(1:J, function(j) sum(unlist(Z_initial)==j)+1)/(sum(C_d)+J)
   }
 
@@ -261,7 +263,7 @@ pkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   L0 <- unname(lm_fit$coefficients)
   V0 <- diag(100,nrow=nrow(L0))
   # Prior for Sigma_j
-  Phi0 <- var(lm_fit$residuals)/5^(2/G)
+  Phi0 <- var(lm_fit$residuals)/J0^(2/G)
   # Prior mean is Phi0/(omega0-G-1)
   omega0 <- G+2
 
@@ -271,7 +273,7 @@ pkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   Sigma_1_J_initial <- unique_output$Sigma_new
 
 
-  #-------------- average acceptance probabilities ---------------------
+  #-------------- Average acceptance probabilities ---------------------
 
   # Acceptance probability
   acceptance_count_avg <- data.frame(P_accept = rep(0,niter), alpha_accept = rep(0,niter),

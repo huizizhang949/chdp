@@ -5,8 +5,7 @@
 \title{Perform MCMC for covariate-dependent hierarchical Dirichlet process to cluster across two single-cell RNA-sequencing datasets}
 \usage{
 gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
-    empirical = TRUE, empirical_z = TRUE, Z_fix = NULL,
-    b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
+    empirical = TRUE, empirical_z = TRUE, Z_fix = NULL, BB_SIZE = TRUE,
     quadratic = FALSE, MH.variance = 0.01,
     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
     sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
@@ -35,15 +34,13 @@ the lower-dimensional embeddings. If \code{empirical_z=FALSE}, clusters are rand
 
 \item{Z_fix}{optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
 where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
-post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.}
-
-\item{b_initial}{optional. Initial values for \eqn{\mathbf{b}}. If not provided, empirical values will be used.}
-
-\item{alpha_initial, alpha_0_initial}{initial values for concentration parameters \eqn{\alpha,\alpha_0}.}
+post-processing step where allocations are fixed to the optimal clustering to infer component-specific parameters.}
 
 \item{quadratic}{If \code{TRUE}, a quadratic relationship is assumed between \eqn{\phi^*_{j,g}} and \eqn{\mu^*_{j,g}}.}
 
 \item{MH.variance}{additional variance added to the empirical covariance (variance) in adaptive Metropolis-Hastings.}
+
+\item{BB_SIZE}{optional. Default to TRUE. See \code{bayNorm} for details.}
 
 \item{mu_r, sigma_r}{mean and standard deviation of the hyper-prior (normal) for \eqn{r_j}.}
 
@@ -53,12 +50,15 @@ post-processing step where allocations are fixed to the optimal clustering to in
 
 \item{kappa_1, kappa_2}{shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.}
 
-\item{beta.mean}{an estimate of global mean capture efficiency across cells, default to be 0.06.}
+\item{beta.mean}{an estimate of global mean capture efficiency across cells, default to be 0.06. Used to set up prior parameters for capture efficiency.}
 
 \item{alpha_mu_2}{optional. Prior variance for \eqn{\mu^*_{j,g}}. If not provided, empirical values will be used.}
 
 \item{partial_pca}{if \code{empirical_z=TRUE}, whether truncated PCA should be used to calculate principal components (requires the irlba package).
 See \code{Rtsne}.}
+
+\item{baynorm_beta, baynorm_tot}{a list of bayNorm estimates of capture efficiencies for each data (will be used as initial values),
+bayNorm results obtained from applying bayNorm to combined datasets.}
 }
 \value{
 \code{gkernelHDP_mcmc} returns a list containing the following components:

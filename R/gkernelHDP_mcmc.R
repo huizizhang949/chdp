@@ -23,24 +23,27 @@
 #' the lower-dimensional embeddings. If \code{empirical_z=FALSE}, clusters are randomly initialized.
 #' @param Z_fix optional. Should be provided when \code{empirical_z} and \code{J} are not available. A list of vectors,
 #' where each vector stores the allocations in \eqn{1,\ldots,J} in one dataset. Typically used in the
-#' post-processing step where allocations are fixed to the optimal clustering to infer cluster-specific parameters.
-#' @param b_initial optional. Initial values for \eqn{\mathbf{b}}. If not provided, empirical values will be used.
-#' @param alpha_initial,alpha_0_initial initial values for concentration parameters \eqn{\alpha,\alpha_0}.
+#' post-processing step where allocations are fixed to the optimal clustering to infer component-specific parameters.
+#' @param BB_SIZE optional. Default to TRUE. See \code{bayNorm} for details.
+#' @param baynorm_beta,baynorm_tot a list of bayNorm estimates of capture efficiencies for each data (will be used as initial values),
+#' bayNorm results obtained from applying bayNorm to combined datasets.
+#' @param alpha_initial,alpha_0_initial initial values for concentration parameters \eqn{\alpha,\alpha_0}. Default to 1.
 #' @param quadratic If \code{TRUE}, a quadratic relationship is assumed between \eqn{\phi^*_{j,g}} and \eqn{\mu^*_{j,g}}.
 #' @param MH.variance additional variance added to the empirical covariance (variance) in adaptive Metropolis-Hastings.
 #' @param mu_r,sigma_r mean and standard deviation of the hyper-prior (normal) for \eqn{r_j}.
 #' @param eta_1,eta_2 shape and scale of the hyper-prior (inverse-gamma) for \eqn{s^2}.
 #' @param mu_h,sigma_h mean and standard deviation of the hyper-prior (normal) for \eqn{h_j}.
 #' @param kappa_1,kappa_2 shape and scale of the hyper-prior (inverse-gamma) for \eqn{m^2}.
-#' @param beta.mean an estimate of global mean capture efficiency across cells, default to be 0.06.
+#' @param beta.mean an estimate of global mean capture efficiency across cells, default to be 0.06. Used to set up prior parameters for capture efficiency.
 #' @param alpha_mu_2 optional. Prior variance for \eqn{\mu^*_{j,g}}. If not provided, empirical values will be used.
 #' @param partial_pca if \code{empirical_z=TRUE}, whether truncated PCA should be used to calculate principal components (requires the irlba package).
 #' See \code{Rtsne}.
 #'
 #' @usage gkernelHDP_mcmc(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
 #'     empirical = TRUE, empirical_z = TRUE, Z_fix = NULL,
-#'     b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
-#'     quadratic = FALSE, MH.variance = 0.01,
+#'     quadratic = FALSE, MH.variance = 0.01, BB_SIZE = TRUE,
+#'     baynorm.beta = baynorm.beta, baynorm_tot = baynorm_tot,
+#'     alpha_initial = 1, alpha_0_initial = 1,
 #'     mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
 #'     sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
 #'     beta.mean = 0.06, alpha_mu_2 = NULL,
@@ -82,8 +85,9 @@
 #'                 burn_in = 0, thinning = 1, empirical = TRUE, empirical_z = TRUE)
 gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
                             empirical = TRUE, empirical_z = TRUE, Z_fix = NULL,
-                            b_initial = NULL, alpha_initial = 1, alpha_0_initial = 1,
-                            quadratic=FALSE, MH.variance = 0.01,
+                            quadratic = FALSE, MH.variance = 0.01, BB_SIZE = TRUE,
+                            baynorm.beta, baynorm_tot,
+                            alpha_initial = 1, alpha_0_initial = 1,
                             mu_r = 0.5, sigma_r = 0.5, eta_1 = 5, eta_2 = 1, mu_h = -5,
                             sigma_h = 0.5, kappa_1 = 5, kappa_2 = 1,
                             beta.mean = 0.06, alpha_mu_2 = NULL,
@@ -93,11 +97,6 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   start_time <- Sys.time()
   print(paste('Start Initialization:', start_time))
   cat('\n')
-
-  # Add cell names
-  colnames(Y[[1]]) <- paste0('d1-',1:ncol(Y[[1]]))
-  colnames(Y[[2]]) <- paste0('d2-',1:ncol(Y[[2]]))
-
 
   # Sample size after burn-in and thinning
   # Apply burn-in first, then apply thinning to the rest samples
@@ -119,12 +118,25 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   if(is.null(J)){
     J <- length(unique(unlist(Z_fix)))
   }
+
+  #----------------------- bayNorm estimates -------------
+
+  # Estimate of mu
+  baynorm.mu.estimate <- baynorm_tot$PRIORS$MME_prior[,1]
+
+  # Estimate of phi
+  if(!BB_SIZE){
+    baynorm.phi.estimate <- baynorm_tot$PRIORS$MME_prior[,2]
+  }else{
+    baynorm.phi.estimate <- baynorm_tot$PRIORS$MME_SIZE_adjust
+  }
+
   #------------------------ Step 1: Prepare for outputs -----------------
   b_output <- NULL
   alpha_phi_2_output <- c()
   Z_output <- NULL
 
-  P_C_J_D_output <- list(list(NULL),list(NULL))
+  P_C_J_D_output <- rep(list(NULL),D)
 
   P_output <- NULL
   alpha_output <- c()
@@ -139,7 +151,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   t_star_J_D_output <- NULL
   sigma_star_2_J_D_output <- NULL
 
-  U_C_J_D_output <- list(list(NULL),list(NULL))
+  U_C_J_D_output <- rep(list(NULL),D)
 
   r_J_output <- NULL
   s_2_output <- c()
@@ -230,165 +242,46 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     return(val)
   }))
 
-  # ---------- baynorm estimate ---------------
-  # bayNorm without Z
-  baynorm_ind <- lapply(1:D, function(d) {
-    bayNorm::bayNorm(Data = Y[[d]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
-                     BB_SIZE = FALSE, verbose = FALSE)
-  })
-  baynorm_tot <- bayNorm::bayNorm(Data = cbind(Y[[1]], Y[[2]]), BETA_vec = NULL, mode_version = TRUE,
-                                  mean_version = FALSE, BB_SIZE = FALSE, verbose = FALSE)
+  # ----------- Initial mu, phi ----------
 
-  mu.estimate <- baynorm_tot$PRIORS$MME_prior$MME_MU
-  # For mu=0, it is replaced by the smallest non-zero value
-  mu.estimate <- ifelse(mu.estimate == 0, min(mu.estimate[mu.estimate!=0]),
-                        mu.estimate)
-  # Adjust mu according to the given beta.mean because beta estimate from baynorm has a mean of 0.06
-  mu.estimate <- mu.estimate*mean(baynorm_tot$PRIORS$BETA_vec)/beta.mean
+  mu.estimate <- ifelse(baynorm.mu.estimate == 0, 0.01, baynorm.mu.estimate)
+  phi.estimate <- ifelse(baynorm.phi.estimate == 0, 0.01, baynorm.phi.estimate)
 
+  #cluster-specific parameters in NB likelihood
+  mu_star_1_J_initial <- t(matrix(mu.estimate, nrow=G, ncol=J))
+  phi_star_1_J_initial <- t(matrix(phi.estimate, nrow=G, ncol=J))
 
-  phi.estimate <- baynorm_tot$PRIORS$MME_prior$MME_SIZE
-  # For phi=Inf, it is replaced by the maximum finite value
-  phi.estimate <- ifelse(is.infinite(phi.estimate), max(phi.estimate[is.finite(phi.estimate)]),
-                         phi.estimate)
-
-
-  # ------ Initial mu, phi and beta ---------------
-  # Initialize mu, phi, alpha_phi_2 and beta based on bayNorm supplied with allocations
-  # then we random choose k clusters with initial values
-  # given by bayNorm without supplying the allocations (global initial).
-  # This is to ensure the initial mu, phi have some differences and also similarities across clusters
-
-  # bayNorm with Z
-  # if there is singleton cluster, do not use bayNorm with Z, initialize mu, phi, beta from global estimates
-  if(any(table(Z_initial[[1]])==1) | any(table(Z_initial[[2]])==1)){
-
-    empirical_by_Z <- FALSE
-
-    mu_star_1_J_initial <- t(matrix(mu.estimate, nrow=G, ncol=J))
-    phi_star_1_J_initial <- t(matrix(phi.estimate, nrow=G, ncol=J))
-
-    Beta_initial <- lapply(1:D, function(d) {
-      b <- baynorm_ind[[d]]$PRIORS$BETA_vec
-      # adjust according to beta.mean
-      b <- ifelse(b/mean(b)*beta.mean >=1, 0.99, b/mean(b)*beta.mean)
-      return(b)
-    })
-
+  # ----------- Initial b ---------
+  if(quadratic){
+    b_initial <- c(0,1,0)
   }else{
-    empirical_by_Z <- TRUE
-
-    baynorm_ind_by_z <- lapply(1:D, function(d) {
-      bayNorm::bayNorm(Data = Y[[d]], BETA_vec = NULL, mode_version = TRUE, mean_version = FALSE,
-                       BB_SIZE = FALSE, verbose = FALSE, Conditions = Z_initial[[d]], Prior_type = 'LL')
-    })
-
-    baynorm_tot_by_z <- bayNorm::bayNorm(Data = do.call(cbind, Y), BETA_vec = NULL, mode_version = TRUE,
-                                         mean_version = FALSE, BB_SIZE = FALSE, verbose = FALSE, Conditions = unlist(Z_initial),
-                                         Prior_type = 'LL')
-
-    # Cluster-specific parameters in NB likelihood
-    mu_star_1_J_initial <- matrix(0, nrow = J, ncol = G)
-    mu_all <- unlist(lapply(baynorm_tot_by_z$PRIORS_LIST, function(l) l$MME_prior$MME_MU))
-    for (j in 1:J){
-      mu_star_1_J_initial[j,] <- ifelse(baynorm_tot_by_z$PRIORS_LIST[[paste('Group',j)]]$MME_prior$MME_MU == 0,
-                                        min(mu_all[mu_all!=0]),
-                                        baynorm_tot_by_z$PRIORS_LIST[[paste('Group',j)]]$MME_prior$MME_MU)
-    }
-
-    # Adjust mu according to the given beta.mean because beta estimate from baynorm has a mean of 0.06
-    mu_star_1_J_initial <- mu_star_1_J_initial*mean(unlist(lapply(baynorm_tot_by_z$PRIORS_LIST, function(l) l$BETA_vec)))/beta.mean
-
-    phi_star_1_J_initial <- matrix(0, nrow = J, ncol = G)
-    phi_all <- unlist(lapply(baynorm_tot_by_z$PRIORS_LIST, function(l) l$MME_prior$MME_SIZE))
-    for(j in 1:J){
-      phi_star_1_J_initial[j,] <- ifelse(is.infinite(baynorm_tot_by_z$PRIORS_LIST[[paste('Group',j)]]$MME_prior$MME_SIZE),
-                                         max(phi_all[is.finite(phi_all)]),
-                                         baynorm_tot_by_z$PRIORS_LIST[[paste('Group',j)]]$MME_prior$MME_SIZE)
-    }
-
-    # Save the adjusted cluster-specific initial mu and phi for later use in initializing alpha_phi_2
-    mu.estimate.z <- c(mu_star_1_J_initial)
-    phi.estimate.z <- c(phi_star_1_J_initial)
-
-    # Select the number of clusters with global initial mu and phi
-    k <- sample(0:J,size=1)
-    # If decide to use global initials, random select some clusters labels jj to assign global initials
-    if(k!=0){
-      jj <- sample(1:J, size = k)
-      for (j in jj) {
-        mu_star_1_J_initial[j,] <- mu.estimate
-        phi_star_1_J_initial[j,] <- phi.estimate
-      }
-    }
-
-    # Cell-specific capture efficiency beta_c_d from bayNorm estimates
-    Beta_initial <- lapply(1:D, function(d) {
-      b <- unlist(lapply(baynorm_ind_by_z[[d]]$PRIORS_LIST, function(l) l$BETA_vec))
-      # Order Beta_initial according to cell orders rather than by group
-      # Currently the beta's from bayNorm are named as 'Group 1.cellname'
-      # extract everything after the first dot
-      group_name <- sub("^[^\\.]*\\.","",names(b))
-      b <- unname(b[match(colnames(Y[[d]]),group_name)])
-      b <- ifelse(b/mean(b)*beta.mean >= 1,
-                                  0.99, b/mean(b)*beta.mean)
-
-      return(b)
-    })
-
-    # Initialize alpha_phi_2 from mu and phi given by bayNorm with Z
-    x.1 <- log(mu.estimate.z)
-    y.1 <- log(phi.estimate.z)
-
-    if(quadratic==FALSE){
-      lm.1 <- lm(y.1 ~ x.1)
-    }else{
-      lm.1 <- lm(y.1 ~ x.1+I(x.1^2))
-    }
-
-    # Estimated sigma^2 (of the linear model): variance of log-phi, used as the initial value of alpha_phi^2
-    alpha_phi_2_initial <- deviance(lm.1)/df.residual(lm.1)
-
-    # Initialize b
-    if(is.null(b_initial)) {
-      b_initial <- as.numeric(coef(lm.1))
-    }
-
+    b_initial <- c(0,1)
   }
 
-  # --------- Prior settings -------------
-  # Only rely on mu, phi and beta from bayNorm without Z, so the priors for different runs are the same as long as the dataset is fixed
-  # even for different J
-
-  # --- alpha_mu_2 -----
+  # --------- Prior: alpha_mu_2, v_1, v_2 and m_b. and Initial alpha_phi_2 -------------
+  # alpha_mu_2
   if(is.null(alpha_mu_2)){
     # prior log(mu) ~ N(0, alpha_mu^2), so alpha_mu^2 = mean(log(mu)^2)
-    alpha_mu_2 <- mean(c(log(mu.estimate)^2))
+    log.mu.finite.index <- which(is.finite(log(baynorm.mu.estimate)))
+    alpha_mu_2 <- mean(c(log(baynorm.mu.estimate[log.mu.finite.index]))^2)
   }
 
-  # ---m_b, v1 and v2 -----
-  x.2 <- log(mu.estimate)
-  y.2 <- log(phi.estimate)
+  # m_b, v1 and v2: based on non-zero mu
+  x.1 <- log(baynorm.mu.estimate[is.finite(log(baynorm.mu.estimate))])
+  y.1 <- log(baynorm.phi.estimate[is.finite(log(baynorm.mu.estimate))])
 
   if(quadratic==FALSE){
-    lm.2 <- lm(y.2 ~ x.2)
+    lm.1 <- lm(y.1 ~ x.1)
   }else{
-    lm.2 <- lm(y.2 ~ x.2+I(x.2^2))
+    lm.1 <- lm(y.1 ~ x.1+I(x.1^2))
   }
 
-  rse.lm.2.squared <- deviance(lm.2)/df.residual(lm.2)
-  if(!empirical_by_Z){
-    alpha_phi_2_initial <- rse.lm.2.squared
-    # Initialize b
-    if(is.null(b_initial)) {
-      b_initial <- as.numeric(coef(lm.2))
-    }
-  }
-
-  # Variance of alpha_phi^2 is 1, mean is rse.lm.2.squared in the inverse gamma prior for alpha_phi^2
+  # estimate of alpha_phi_2
+  rse.lm.1.squared <- deviance(lm.1)/df.residual(lm.1)
+  # variance of alpha_phi^2 is 1, mean is rse.lm.2.squared in the inverse gamma prior for alpha_phi^2
   variance <- 1
-  v_1_empirical <- rse.lm.2.squared^2/variance + 2
-  v_2_empirical <- (v_1_empirical - 1)*rse.lm.2.squared
+  v_1_empirical <- rse.lm.1.squared^2/variance + 2
+  v_2_empirical <- (v_1_empirical - 1)*rse.lm.1.squared
 
   if(empirical == TRUE){
     v_1 <- v_1_empirical
@@ -397,8 +290,10 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     v_1 <- 2; v_2 <- 1
   }
 
+  alpha_phi_2_initial <- rse.lm.1.squared
+
   if(empirical == TRUE){
-    m_b <- as.numeric(coef(lm.2))
+    m_b <- as.numeric(coef(lm.1))
   }else{
     if(quadratic==TRUE){
       m_b <- c(-1,2,0)
@@ -407,45 +302,40 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     }
   }
 
-  # ---- a_d_beta, b_d_beta ---------
-  # Function to set empirical values for hyper parameters in prior of beta ~ Beta(a_d,b_d)
-  baynorm_estimate_beta_param <- function(baynorm_output, additional_variance, beta.mean){
+  # --------- Prior: a_d_beta and b_d_beta and Initials for beta -------------
+  Beta_initial <- baynorm.beta
+  loop.result <- lapply(1:D, function(d){
 
-    ## Normlized beta
-    beta_vec <- baynorm_output$PRIORS$BETA_vec
-    beta.normalized <- beta_vec/mean(beta_vec)*beta.mean
-    beta.normalized <- ifelse(beta.normalized >= 1, 0.99, beta.normalized)
+    ##-- Initial mean and variance
+    baynorm_mean_capeff <- beta.mean
+    baynorm_var_capeff <- var(baynorm.beta[[d]]) + 0.01
 
-    baynorm_mean_capeff <- mean(beta.normalized) # Mean of the beta prior for beta
-    baynorm_var_capeff <- var(beta.normalized) + additional_variance # Variance of the beta prior
+    ##-- Initial a_beta and b_beta
     a_beta <- ((1-baynorm_mean_capeff)/baynorm_var_capeff - 1/baynorm_mean_capeff)*baynorm_mean_capeff^2
     b_beta <- a_beta*(1/baynorm_mean_capeff - 1)
 
-    # to ensure unimodal prior
-    while(a_beta<1 | b_beta<1) {
+    while((baynorm_var_capeff >= baynorm_mean_capeff*(1-baynorm_mean_capeff)) | (a_beta < 1) | (b_beta < 1)){
+
+      ##-- While the above condition is true, half the variance
       baynorm_var_capeff <- baynorm_var_capeff/2
+
+      ##-- Compute the new a_beta and b_beta
       a_beta <- ((1-baynorm_mean_capeff)/baynorm_var_capeff - 1/baynorm_mean_capeff)*baynorm_mean_capeff^2
       b_beta <- a_beta*(1/baynorm_mean_capeff - 1)
 
     }
 
-    return(c(a_beta,b_beta))
-
-  }
-
-  # Emprical values for for a_d_beta and b_d_beta (parameters in prior for beta ~ Beta(a_d, b_d))
-  bay_summary <- lapply(1:D, function(d) {
-    baynorm_estimate_beta_param(baynorm_output = baynorm_ind[[d]], additional_variance = 0.01, beta.mean = beta.mean)
+    return(c('a_beta' = a_beta,'b_beta' = b_beta))
   })
 
-  a_d_beta <- unlist(lapply(bay_summary, function(l) l[1]))
-  b_d_beta <- unlist(lapply(bay_summary, function(l) l[2]))
+  a_d_beta <- unlist(lapply(loop.result, function(l) l['a_beta']))
+  b_d_beta <- unlist(lapply(loop.result, function(l) l['b_beta']))
 
   if(any(c(a_d_beta,b_d_beta)<0)) {
     stop('Prior setting for beta inappropriate!!')
   }
 
-  #-------------- average acceptance probabilities ---------------------
+  #-------------- Average acceptance probabilities ---------------------
 
   # Acceptance probability
   acceptance_count_avg <- data.frame(P_accept = rep(0,niter), alpha_accept = rep(0,niter),
@@ -505,7 +395,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
   sd_P_new <- 0.001
   mean_X_component_new <- log(matrix(P_initial[1:(J-1)]/P_initial[J], nrow = 1)) # 1x(J-1)
   tilde_s_component_new <- t(mean_X_component_new)%*%mean_X_component_new
-  # At 1st iteration, the covariance based on the intial values are 0
+  # At the 1st iteration, the covariance based on the initial values are 0
   covariance_component_new <- matrix(0, nrow = J-1, ncol = J-1)
 
   # 2) For alpha
@@ -617,8 +507,11 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     # ---- Calculate P_C_J_D -------
     P_C_J_D_new <- lapply(1:D, function(d) {
       temp <- t(sapply(t[[d]],function(time) {
-        Q_J_D_new[,d]*rbf(time,t_star_J_D_new[,d],sigma_star_2_J_D_new[,d])/(
-          sum(Q_J_D_new[,d]*rbf(time,t_star_J_D_new[,d],sigma_star_2_J_D_new[,d])))
+        # log-scale
+        LP <- log(Q_J_D_new[,d])-(time-t_star_J_D_new[,d])^2/2/sigma_star_2_J_D_new[,d]
+        nc <- -max(LP)
+        P <- exp(LP+nc)/sum(exp(LP+nc))
+        return(P)
       }))
     })
 
@@ -667,7 +560,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     alpha_count <- alpha_count + alpha_output_sim$accept
     acceptance_count_avg$alpha_accept[iter-1] <- alpha_count/(iter-1)
 
-    # 6) -------- Update alpha_0 ----------
+    # 7) -------- Update alpha_0 ----------
     alpha_0_output_sim <- alpha_0_update(P = P_new, alpha_0 = alpha_0_new,
                                          X_mean = mean_X_alpha_0_new,
                                          M_2 = M_2_alpha_0_new,
@@ -681,7 +574,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     alpha_0_count <- alpha_0_count + alpha_0_output_sim$accept
     acceptance_count_avg$alpha_0_accept[iter-1] <- alpha_0_count/(iter-1)
 
-    # 7) ------ Update mean_dispersion -------
+    # 8) ------ Update mean_dispersion -------
     mean_dispersion_output <- mean_dispersion(mu_star_1_J = mu_star_1_J_new,
                                               phi_star_1_J = phi_star_1_J_new,
                                               v_1 = v_1, v_2 = v_2, m_b = m_b,
@@ -690,7 +583,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     alpha_phi_2_new <- mean_dispersion_output$alpha_phi_2
     b_new <- mean_dispersion_output$b
 
-    # 8) -------- Update unique parameters --------
+    # 9) -------- Update unique parameters --------
     unique_output_sim <- unique_parameters_update(mu_star_1_J = mu_star_1_J_new,
                                                   phi_star_1_J = phi_star_1_J_new,
                                                   mean_X_mu_phi = mean_X_unique_new,
@@ -710,7 +603,7 @@ gkernelHDP_mcmc <- function(Y, t, J = NULL, niter, burn_in = 1000, thinning = 1,
     unique_count <- unique_count + unique_output_sim$accept_count
     acceptance_count_avg$unique_accept[iter-1] <- unique_count/((iter-1)*J*G)
 
-    # 9) ------ Update capture efficiency -----------
+    # 10) ------ Update capture efficiency -----------
     capture_output_sim <- capture_efficiencies_update(Beta = Beta_new, Y = Y, Z = Z_new,
                                                       mu_star_1_J = mu_star_1_J_new,
                                                       phi_star_1_J = phi_star_1_J_new,

@@ -15,12 +15,11 @@ Xi_C_D_update_gkernel <- function(Q_J_D, C_d, t, t_star_J_D, sigma_star_2_J_D){
   # Draw from Gamma (full conditional distribution)
   for (d in 1:D) {
     rates <- vapply(1:C_d[d], function(c) {
-      log_rbf_value <-
-        -(t[[d]][c] - t_star_J_D[, d]) ^ 2 / 2 / sigma_star_2_J_D[, d]
-      log_temp <- log(Q_J_D[, d]) + log_rbf_value
+      log_rbf_value <- -(t[[d]][c]-t_star_J_D[,d])^2/2/sigma_star_2_J_D[,d]
+      log_temp <- log(Q_J_D[,d])+log_rbf_value
       log_K <- max(log_temp)
 
-      return(exp(log_K) * sum(exp(log_temp - log_K)))
+      return(exp(log_K)*sum(exp(log_temp-log_K)))
     }, FUN.VALUE = numeric(1))
 
     Xi[[d]] <- rgamma(C_d[d], shape = 1, rate = rates)
@@ -71,33 +70,18 @@ allocation_variables_update_gkernel <- function(Y, t, mu_star_1_J, phi_star_1_J,
 
   # Set up the list to save updated values
   Z <- NULL
-  for (d in 1:D){
+  for(d in 1:D){
     Z[[d]] <- rep(0,C_d[d])
   }
 
-  for (d in 1:D){
+  for(d in 1:D){
 
-    loop.result <- vapply(1:C_d[d], function(c) {
+    P_d <- compute_probability_cpp(Y_d = Y[[d]], Beta = Beta[[d]], mu = mu_star_1_J, phi = phi_star_1_J, Q_J = Q_J_D[,d],
+                                   t_d = t[[d]], t_star_J = t_star_J_D[,d], sigma_star_2_J = sigma_star_2_J_D[,d])
 
-      ## Set log probability
-      LP <- vapply(1:J, function(j) {
-
-        sum(dnbinom(Y[[d]][,c], mu = mu_star_1_J[j,]*Beta[[d]][c], size = phi_star_1_J[j,], log = TRUE)) +
-          log(Q_J_D[j,d]) - (t[[d]][c]-t_star_J_D[j,d])^2/2/sigma_star_2_J_D[j,d]
-
-      }, FUN.VALUE = numeric(1))
-
-      ## Compute the normalizing constant
-      nc <- -max(LP)
-      P <- exp(LP + nc)/sum(exp(LP + nc)) # LP is a vector of length J
-      Z <- sample(1:J, 1, prob = P)
-
-      return(Z)
-    }, FUN.VALUE = numeric(1))
-
-    Z[[d]] <- loop.result
+    Z_d <- apply(P_d, 1, function(x) extraDistr::rcat(n = 1, prob = x))
+    Z[[d]] <- Z_d
   }
-
   return(Z)
 }
 
@@ -146,11 +130,11 @@ t_star_J_D_update <- function(r_J, s_2, Z, t, C_d, sigma_star_2_J_D, U_C_J_D, Xi
         i_all_complement <- lapply(ind, function(c) {
           temp <- -2*sigma_star_2_J_D[j,d]*(log(-log(U_C_J_D[[d]][c,j]))-log(Xi_C_D[[d]][c])-log(Q_J_D[j,d]))
 
-          i_complement <- sets::interval(t[[d]][c]-sqrt(temp), t[[d]][c]+sqrt(temp), '[]')
+          i_complement <- matrix(c(t[[d]][c]-sqrt(temp),t[[d]][c]+sqrt(temp)),nrow=1)
           return(i_complement)
         })
 
-        i_all <- sets::interval_complement(sets::interval_union(i_all_complement))
+        i_all <- intervals::interval_complement(intervals::interval_union(intervals::Intervals(do.call(rbind,i_all_complement))))@.Data
       }
 
       # Parameters in posterior distribution (Normal)
@@ -164,32 +148,30 @@ t_star_J_D_update <- function(r_J, s_2, Z, t, C_d, sigma_star_2_J_D, U_C_J_D, Xi
         # No truncation, draw from the Normal posterior directly
         t_star[j,d] <- rnorm(1, mean = r_j_hat, sd = sqrt(s_2_hat))
       }else{
-        N_interval <- length(i_all)
-        log_p <- c()
-
+        N_interval <- nrow(i_all)
         # Compute the probability of lying in each interval
-        for (l in 1:N_interval) {
-          i <- i_all[[l]]
-          lower <- as.numeric(unlist(i)[1])
-          upper <- as.numeric(unlist(i)[2])
-
+        log_p <- unlist(lapply(1:N_interval,function(l) {
+          i <- i_all[l,]
+          lower <- i[1]
+          upper <- i[2]
           if(is.infinite(lower)){
-            log_p <- c(log_p,pnorm(upper, mean = r_j_hat, sd = sqrt(s_2_hat), log.p = TRUE))
+            val <- pnorm(upper,mean = r_j_hat, sd = sqrt(s_2_hat),log.p = TRUE)
           }else if(is.infinite(upper)){
-            log_p <- c(log_p,pnorm(lower, mean = r_j_hat, sd = sqrt(s_2_hat), log.p = TRUE, lower.tail = FALSE))
+            val <- pnorm(lower,mean = r_j_hat, sd = sqrt(s_2_hat),log.p = TRUE, lower.tail = FALSE)
           }else{
-            log_p <- c(log_p,log(pnorm(upper, mean = r_j_hat, sd = sqrt(s_2_hat))-
-                                  pnorm(lower, mean = r_j_hat, sd = sqrt(s_2_hat))))
+            lp1 <- pnorm(upper,mean = r_j_hat, sd = sqrt(s_2_hat), log.p = TRUE)
+            lp2 <- pnorm(lower,mean = r_j_hat, sd = sqrt(s_2_hat), log.p = TRUE)
+            val <- lp1+log(1-exp(lp2-lp1))
           }
-        }
-
+          return(val)
+        }))
         log_K <- -max(log_p)
 
         # Select one truncated region (one interval)
         ind2 <- sample(1:N_interval, size = 1, prob = exp(log_p+log_K)) #breakpoint
-        i_chosen <- i_all[[ind2]]
-        t_star[j,d] <- truncnorm::rtruncnorm(1, a = as.numeric(unlist(i_chosen)[1]),
-                                             b = as.numeric(unlist(i_chosen)[2]),
+        i_chosen <- i_all[ind2,]
+        t_star[j,d] <- truncnorm::rtruncnorm(1, a = i_chosen[1],
+                                             b = i_chosen[2],
                                              mean = r_j_hat, sd = sqrt(s_2_hat))
       }
     }
@@ -630,7 +612,7 @@ mean_dispersion <- function(mu_star_1_J, phi_star_1_J,m_b,v_1,v_2,quadratic=FALS
   parameter2 <- 0
 
   # For each j, update the parameters
-  if(quadratic==FALSE){
+  if(!quadratic){
     for(j in 1:J) {
       mu_tilde_j <- matrix(c(rep(1,G),log(mu_star_1_J[j,])), ncol=2, nrow=G)
       # For posterior variance of b
@@ -683,7 +665,7 @@ unique_parameters_log_prob <- function(mu_star, phi_star, Z, b, alpha_phi_2, Y, 
   # The algorithm select the cells separately for the 1st and 2nd dataset
   Y_c_g_d_j <- c(Y[[1]][g,which(Z[[1]]==j)], Y[[2]][g,which(Z[[2]]==j)])
 
-  if(quadratic==FALSE){
+  if(!quadratic){
     lprod1 <- -log(mu_star*phi_star) - 1/(2*alpha_mu_2)*(log(mu_star))^2 -
       (log(phi_star)-(b[1]+b[2]*log(mu_star)))^2/(2*alpha_phi_2)
   }else{
@@ -736,7 +718,7 @@ unique_parameters_update <- function(mu_star_1_J, phi_star_1_J, mean_X_mu_phi, t
       mu_star_old <- mu_star_1_J[j,g]; phi_star_old <- phi_star_1_J[j,g]
 
       # If cluster j is empty with respect to all datasets, sample mu and phi from their priors
-      if(sum(unlist(sapply(Z,function(l) l==j)))==0){
+      if(!any(unlist(Z)==j)){
         mu_star_new <- rlnorm(1, meanlog = 0, sdlog = sqrt(alpha_mu_2))
         if(quadratic){
           phi_star_new <- rlnorm(1, meanlog = b[1]+b[2]*log(mu_star_new)+b[3]*log(mu_star_new)^2, sdlog = sqrt(alpha_phi_2))
@@ -826,14 +808,23 @@ unique_parameters_update <- function(mu_star_1_J, phi_star_1_J, mean_X_mu_phi, t
 
 ##------------- Simulation of capture efficiencies --------------------
 
-capture_efficiencies_log_prob <- function(Beta_single, Y, Z, mu_star_1_J, phi_star_1_J, c, d, a_d_beta, b_d_beta){
+capture_efficiencies_log_prob <- function(Beta_d, Y, Z, mu_star_1_J, phi_star_1_J, d, a_d_beta, b_d_beta){
 
-  j <- Z[[d]][c]
+  j <- Z[[d]]
   # Construct the log-probability
-  lprod1 <- (a_d_beta[d]-1)*log(Beta_single) + (b_d_beta[d]-1)*log(1-Beta_single)
-  lprod2 <- sum((phi_star_1_J[j,]+Y[[d]][,c])*log(phi_star_1_J[j,]+mu_star_1_J[j,]*Beta_single) - Y[[d]][,c]*log(Beta_single))
+  lprod1 <- (a_d_beta[d]-1)*log(Beta_d) + (b_d_beta[d]-1)*log(1-Beta_d)
+
+  # mu x beta: C x G
+  mu_star_beta <- apply(mu_star_1_J[j,], 2, function(x) x*Beta_d)
+
+  # Y x log(beta): C x G
+  Y_log_beta <- apply(t(Y[[d]]), 2, function(x) x*log(Beta_d))
+
+  lprod2 <- rowSums((phi_star_1_J[j,]+t(Y[[d]]))*log(phi_star_1_J[j,] + mu_star_beta) - Y_log_beta)
+
   lprod <- lprod1 - lprod2
 
+  # Return the log-probability
   return(lprod)
 }
 
@@ -848,66 +839,60 @@ capture_efficiencies_update <- function(Beta, Y, Z, mu_star_1_J, phi_star_1_J, a
   M_2_old <- M_2; mean_X_old <- mean_X; variance_old <- variance
 
   # To store outputs
-  Beta_new <- NULL; Beta_new[[1]] <- rep(0,C_d[1]); Beta_new[[2]] <- rep(0,C_d[2])
-
-  variance_new <- NULL; variance_new[[1]] <- rep(0,C_d[1]); variance_new[[2]] <- rep(0,C_d[2])
-  mean_X_new <- NULL; mean_X_new[[1]] <- rep(0,C_d[1]); mean_X_new[[2]] <- rep(0,C_d[1])
-  M_2_new <- NULL; M_2_new[[1]] <- rep(0,C_d[1]); M_2_new[[2]] <- rep(0,C_d[2])
+  Beta_new <- NULL
+  variance_new <- NULL
+  mean_X_new <- NULL
+  M_2_new <- NULL
+  X_new <- NULL
 
   n <- iter_num
 
   accept_count <- 0
 
   for(d in 1:D){
-    loop.result <- lapply(1:C_d[d], function(c) {
+    Beta_d_old <- Beta[[d]]
+    X_d_old <- log(Beta_d_old/(1-Beta_d_old))
 
-      Beta_single_old <- Beta[[d]][c]
-      X_old <- log(Beta_single_old/(1-Beta_single_old))
+    if(n <= 100){
+      X_d_new <- rnorm(n = length(X_d_old), mean = X_d_old, sd = 0.1)
+    }else{
+      X_d_new <- rnorm(n = length(X_d_old), mean = X_d_old, sd = sqrt((2.4^2)*variance_old[[d]] + 2.4^2*MH.variance))
+    }
 
-      if(n <= 100){
-        X_new <- rnorm(n = 1, mean = X_old, sd = 0.1)
-      }else{
-        X_new <- rnorm(n = 1, mean = X_old, sd = sqrt((2.4^2)*variance_old[[d]][c] + 2.4^2*MH.variance))
-      }
+    Beta_d_new <- 1/(1+exp(-X_d_new))
+    if(any(Beta_d_new==1)) {
+      Beta_d_new[Beta_d_new==1] <- 1-.Machine$double.eps
+    }
+    # Compute the acceptance probability
+    acceptance_prob_log <- capture_efficiencies_log_prob(Beta_d = Beta_d_new, Y, Z, mu_star_1_J,
+                                                         phi_star_1_J,d,a_d_beta,b_d_beta) -
+      capture_efficiencies_log_prob(Beta_d = Beta_d_old, Y, Z, mu_star_1_J, phi_star_1_J,
+                                    d,a_d_beta,b_d_beta) + log(Beta_d_new) + log(1-Beta_d_new) -
+      log(Beta_d_old) - log(1-Beta_d_old)
 
-      # Transform back to beta
-      Beta_single_new <- 1/(1+exp(-X_new))
-      if(Beta_single_new==1) {
-        Beta_single_new <- 1-.Machine$double.eps
-      }
 
-      # Compute the acceptance probability
-      acceptance_prob_log <- capture_efficiencies_log_prob(Beta_single = Beta_single_new, Y, Z, mu_star_1_J,
-                                                           phi_star_1_J, c, d, a_d_beta, b_d_beta) -
-        capture_efficiencies_log_prob(Beta_single = Beta_single_old, Y, Z, mu_star_1_J, phi_star_1_J,
-                                      c, d, a_d_beta, b_d_beta) + log(Beta_single_new) + log(1-Beta_single_new) -
-        log(Beta_single_old) - log(1-Beta_single_old)
-
-      acceptance_beta <- min(1, exp(acceptance_prob_log))
-
-      outcome <- rbinom(n = 1, size = 1, prob = acceptance_beta)
-      if(is.na(outcome) == TRUE | outcome == 0){
-        X_new <- X_old
-        Beta_single_new <- Beta_single_old
-        accept <- 0
-      }else{
-        accept <- 1
-      }
-
-      ## Output result
-      list(Beta_single_new, X_new, accept)
+    outcome <- sapply(1:C_d[d], function(c) {
+      rbinom(n = 1,size = 1,prob = min(1, exp(acceptance_prob_log[c])))
     })
 
+    accept.num <- 0
     for(c in 1:C_d[d]){
-      Beta_single_new <- loop.result[[c]][[1]]
-      X_new <- loop.result[[c]][[2]]
-      accept_count <- accept_count+loop.result[[c]][[3]]
 
-      Beta_new[[d]][c] <- Beta_single_new
-      mean_X_new[[d]][c] <- (1-1/n)*mean_X_old[[d]][c]+(1/n)*X_new
-      M_2_new[[d]][c] <- M_2_old[[d]][c] + (X_new-mean_X_old[[d]][c])*(X_new-mean_X_new[[d]][c])
-      variance_new[[d]][c] <- 1/(n-1)*M_2_new[[d]][c]
+      if(is.na(outcome[c]) == TRUE | outcome[c] == 0){
+        X_d_new[c] <- X_d_old[c]
+        Beta_d_new[c] <- Beta_d_old[c]
+      }else{
+        accept.num <- accept.num + 1
+      }
     }
+
+    Beta_new[[d]] <- Beta_d_new
+    X_new[[d]] <- X_d_new
+    accept_count <- accept_count+accept.num
+
+    mean_X_new[[d]] <- (1-1/n)*mean_X_old[[d]] + (1/n)*X_new[[d]]
+    M_2_new[[d]] <- M_2_old[[d]] + (X_new[[d]]-mean_X_old[[d]])*(X_new[[d]]-mean_X_new[[d]])
+    variance_new[[d]] <- 1/(n-1)*M_2_new[[d]]
   }
 
   return(list(Beta_new=Beta_new, accept_count=accept_count, mean_X_new=mean_X_new,

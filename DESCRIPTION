@@ -26,7 +26,7 @@ Imports:
     Matrix,
     Rtsne,
     irlba,
-    sets,
+    intervals,
     truncnorm,
     MCMCpack,
     mniw,
@@ -48,4 +48,7 @@ Imports:
     grid,
     ggplotify,
     reshape2,
-    ggh4x
+    ggh4x,
+    Rcpp
+LinkingTo: 
+    Rcpp
