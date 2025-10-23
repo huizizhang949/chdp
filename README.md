@@ -453,7 +453,7 @@ t1 <- sim2.data[1:C[1],G+2]; p_j1 <- sim2.data[1:C[1],-(1:(G+2))]
 Y2 <- sim2.data[(C[1]+1):sum(C),1:G]; z2 <- sim2.data[(C[1]+1):sum(C),G+1]; 
 t2 <- sim2.data[(C[1]+1):sum(C),G+2]; p_j2 <- sim2.data[(C[1]+1):sum(C),-(1:(G+2))]
 
-# the first observation will not be clustered in each dataset
+# the first observation will not be clustered in each dataset due to lag 1 in the VAR likelihood
 C=C-1
 ```
 
